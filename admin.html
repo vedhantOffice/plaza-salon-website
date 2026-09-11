@@ -180,9 +180,20 @@ function showMsg(el, text, kind){
   el.className = 'msg ' + kind;
 }
 
+// Only these emails are allowed to even request a sign-in link. The database
+// itself also only lets these two accounts read/update bookings (via RLS),
+// so this is a friendlier first check, not the only line of defense.
+var ALLOWED_EMAILS = ['vedhantoffice@gmail.com', 'plazaplanet.pp@gmail.com'];
+
 loginForm.addEventListener('submit', function(e){
   e.preventDefault();
   var email = document.getElementById('loginEmail').value.trim();
+
+  if (ALLOWED_EMAILS.indexOf(email.toLowerCase()) === -1) {
+    showMsg(loginMsg, "That email isn't authorised for staff login.", 'err');
+    return;
+  }
+
   loginBtn.disabled = true;
   loginBtn.textContent = 'Sending…';
   sb.auth.signInWithOtp({

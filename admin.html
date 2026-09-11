@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plaza's Salon — Staff Login</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0c0c0d;
+    --charcoal:#161513;
+    --panel:#1c1a17;
+    --gold:#c9a227;
+    --gold-light:#e8c766;
+    --gold-dim:#8c7a54;
+    --ivory:#f3efe6;
+    --ivory-dim:#cfc7b4;
+    --line: rgba(201,162,39,0.28);
+    --serif: "Bodoni Moda", "Times New Roman", Georgia, serif;
+    --sans: "Jost", "Segoe UI", Arial, sans-serif;
+    --good:#7fae6a;
+    --warn:#c98f27;
+    --bad:#b25b4a;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--black);color:var(--ivory);font-family:var(--sans);}
+  a{color:var(--gold-light);}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+  header{border-bottom:1px solid var(--line);padding:22px 0;}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:700;font-size:1.3rem;color:var(--ivory);text-decoration:none;}
+  .brand span{color:var(--gold-light);}
+  nav.top a{color:var(--ivory-dim);text-decoration:none;font-size:.85rem;margin-left:18px;}
+  nav.top a:hover{color:var(--gold-light);}
+
+  main{padding:48px 0 80px;}
+  h1{font-family:var(--serif);font-weight:700;font-size:2rem;margin:0 0 8px;text-wrap:balance;}
+  .sub{color:var(--ivory-dim);margin:0 0 32px;font-size:.95rem;}
+
+  /* login */
+  .login-card{max-width:420px;margin:40px auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:32px;text-align:center;}
+  .login-card h1{font-size:1.5rem;}
+  .login-card p{color:var(--ivory-dim);font-size:.9rem;line-height:1.6;}
+  .field{margin:20px 0;text-align:left;}
+  label{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:8px;}
+  input[type="email"]{width:100%;padding:12px 14px;background:var(--black);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font:inherit;font-size:.95rem;}
+  input[type="email"]:focus{outline:none;border-color:var(--gold);}
+  button{font:inherit;cursor:pointer;}
+  .btn-solid{width:100%;padding:13px 20px;background:var(--gold);color:var(--black);border:none;border-radius:6px;font-weight:600;font-size:.95rem;letter-spacing:.02em;transition:background .15s;}
+  .btn-solid:hover{background:var(--gold-light);}
+  .btn-solid:disabled{opacity:.55;cursor:default;}
+  .msg{margin-top:18px;font-size:.85rem;padding:12px 14px;border-radius:6px;display:none;}
+  .msg.ok{display:block;background:rgba(127,174,106,.12);color:#a8cf95;border:1px solid rgba(127,174,106,.3);}
+  .msg.err{display:block;background:rgba(178,91,74,.12);color:#e0998a;border:1px solid rgba(178,91,74,.3);}
+
+  /* dashboard */
+  .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 18px;min-width:96px;}
+  .stat .n{font-family:var(--serif);font-size:1.6rem;font-weight:700;color:var(--gold-light);font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ivory-dim);margin-top:2px;}
+  .btn-ghost{padding:9px 16px;background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--ivory-dim);font-size:.85rem;}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--ivory);}
+
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
+  table{width:100%;border-collapse:collapse;min-width:840px;}
+  thead th{text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gold-dim);font-weight:500;padding:14px 16px;background:var(--panel);border-bottom:1px solid var(--line);white-space:nowrap;}
+  tbody td{padding:14px 16px;border-bottom:1px solid var(--line);font-size:.88rem;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(201,162,39,.04);}
+  .muted{color:var(--ivory-dim);}
+  .pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;}
+  .pill-salon{background:rgba(201,162,39,.15);color:var(--gold-light);}
+  .pill-academy{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+  select.status{background:var(--black);color:var(--ivory);border:1px solid var(--line);border-radius:5px;padding:6px 8px;font:inherit;font-size:.8rem;}
+  select.status.st-new{color:var(--warn);border-color:var(--warn);}
+  select.status.st-contacted{color:var(--gold-light);border-color:var(--gold-dim);}
+  select.status.st-confirmed{color:var(--good);border-color:var(--good);}
+  select.status.st-done{color:var(--ivory-dim);}
+  select.status.st-cancelled{color:var(--bad);border-color:var(--bad);}
+  .empty{padding:60px 20px;text-align:center;color:var(--ivory-dim);}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">Plaza's <span>Salon</span></a>
+    <nav class="top">
+      <a href="index.html">Salon Site</a>
+      <a href="academy.html">Academy Site</a>
+      <a href="#" id="signOutLink" hidden>Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- LOGIN -->
+    <section id="loginView">
+      <div class="login-card">
+        <h1>Staff Login</h1>
+        <p>Enter the owner's email to get a secure sign-in link. No password needed.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <button type="submit" class="btn-solid" id="loginBtn">Send Sign-In Link</button>
+        </form>
+        <div class="msg" id="loginMsg"></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashView" hidden>
+      <h1>Bookings &amp; Enquiries</h1>
+      <p class="sub">Everything submitted through the Book Now form on the salon site.</p>
+
+      <div class="toolbar">
+        <div class="stats">
+          <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Total</div></div>
+          <div class="stat"><div class="n" id="statNew">0</div><div class="l">New</div></div>
+        </div>
+        <button class="btn-ghost" id="refreshBtn">Refresh</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="bookingsTable">
+          <thead>
+            <tr>
+              <th>Received</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Source</th>
+              <th>Need</th>
+              <th>Preferred</th>
+              <th>Notes</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody"></tbody>
+        </table>
+        <div class="empty" id="emptyState" hidden>No bookings yet — they'll show up here as soon as someone books on the site.</div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var loginView = document.getElementById('loginView');
+var dashView = document.getElementById('dashView');
+var signOutLink = document.getElementById('signOutLink');
+var loginForm = document.getElementById('loginForm');
+var loginMsg = document.getElementById('loginMsg');
+var loginBtn = document.getElementById('loginBtn');
+var bookingsBody = document.getElementById('bookingsBody');
+var emptyState = document.getElementById('emptyState');
+var statTotal = document.getElementById('statTotal');
+var statNew = document.getElementById('statNew');
+
+function showMsg(el, text, kind){
+  el.textContent = text;
+  el.className = 'msg ' + kind;
+}
+
+loginForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = document.getElementById('loginEmail').value.trim();
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Sending…';
+  sb.auth.signInWithOtp({
+    email: email,
+    options: { emailRedirectTo: window.location.href }
+  }).then(function(res){
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Send Sign-In Link';
+    if (res.error) {
+      showMsg(loginMsg, res.error.message, 'err');
+    } else {
+      showMsg(loginMsg, 'Check ' + email + ' for a sign-in link, then open it on this device.', 'ok');
+    }
+  });
+});
+
+signOutLink.addEventListener('click', function(e){
+  e.preventDefault();
+  sb.auth.signOut().then(function(){ window.location.reload(); });
+});
+
+function fmtDate(iso){
+  if (!iso) return '';
+  var d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) + ' · ' +
+         d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+}
+
+function renderBookings(rows){
+  bookingsBody.innerHTML = '';
+  if (!rows || rows.length === 0) {
+    emptyState.hidden = false;
+    document.getElementById('bookingsTable').hidden = true;
+    statTotal.textContent = '0';
+    statNew.textContent = '0';
+    return;
+  }
+  emptyState.hidden = true;
+  document.getElementById('bookingsTable').hidden = false;
+
+  statTotal.textContent = rows.length;
+  statNew.textContent = rows.filter(function(r){ return r.status === 'new'; }).length;
+
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+
+    var preferred = [];
+    if (r.preferred_date) preferred.push(r.preferred_date);
+    if (r.preferred_time) preferred.push(r.preferred_time);
+
+    tr.innerHTML =
+      '<td class="muted">' + fmtDate(r.created_at) + '</td>' +
+      '<td>' + escapeHtml(r.name || '') + '</td>' +
+      '<td><a href="https://wa.me/' + (r.phone||'').replace(/[^\d]/g,'') + '" target="_blank" rel="noopener">' + escapeHtml(r.phone || '') + '</a></td>' +
+      '<td><span class="pill pill-' + (r.source||'salon') + '">' + (r.source||'salon') + '</span></td>' +
+      '<td>' + escapeHtml(r.service || '—') + '</td>' +
+      '<td class="muted">' + escapeHtml(preferred.join(' · ') || '—') + '</td>' +
+      '<td class="muted">' + escapeHtml(r.notes || '—') + '</td>' +
+      '<td></td>';
+
+    var statusTd = tr.lastElementChild;
+    var select = document.createElement('select');
+    select.className = 'status st-' + r.status;
+    ['new','contacted','confirmed','done','cancelled'].forEach(function(s){
+      var opt = document.createElement('option');
+      opt.value = s; opt.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+      if (s === r.status) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.addEventListener('change', function(){
+      var newStatus = select.value;
+      select.className = 'status st-' + newStatus;
+      sb.from('bookings').update({ status: newStatus }).eq('id', r.id).then(function(res){
+        if (res.error) { console.error(res.error); alert('Could not update status: ' + res.error.message); }
+        else { r.status = newStatus; statNew.textContent = rows.filter(function(x){ return x.status === 'new'; }).length; }
+      });
+    });
+    statusTd.appendChild(select);
+
+    bookingsBody.appendChild(tr);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+function loadBookings(){
+  sb.from('bookings').select('*').order('created_at', { ascending: false }).then(function(res){
+    if (res.error) {
+      console.error(res.error);
+      emptyState.hidden = false;
+      emptyState.textContent = 'Could not load bookings: ' + res.error.message;
+      document.getElementById('bookingsTable').hidden = true;
+      return;
+    }
+    renderBookings(res.data);
+  });
+}
+
+document.getElementById('refreshBtn').addEventListener('click', loadBookings);
+
+function showDashboard(){
+  loginView.hidden = true;
+  dashView.hidden = false;
+  signOutLink.hidden = false;
+  loadBookings();
+}
+function showLogin(){
+  loginView.hidden = false;
+  dashView.hidden = true;
+  signOutLink.hidden = true;
+}
+
+sb.auth.getSession().then(function(res){
+  if (res.data && res.data.session) showDashboard();
+  else showLogin();
+});
+
+sb.auth.onAuthStateChange(function(event, session){
+  if (session) showDashboard();
+  else showLogin();
+});
+</script>
+</body>
+</html>

@@ -651,17 +651,15 @@ if (bookForm) {
     if (fallback) fallback.href = waUrl;
     var success = document.getElementById('bookSuccess');
 
-    var submitBtn = bookForm.querySelector('.book-submit');
-    var originalBtnText = submitBtn ? submitBtn.textContent : '';
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+    // Open WhatsApp immediately, synchronously within the click — browsers block
+    // window.open() called after an async delay (e.g. waiting on a DB save),
+    // so this must not wait on the Supabase insert below.
+    window.open(waUrl, '_blank');
+    if (success) success.style.display = 'block';
+    bookForm.reset();
 
-    function finishUp(){
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtnText; }
-      if (success) success.style.display = 'block';
-      window.open(waUrl, '_blank');
-      bookForm.reset();
-    }
-
+    // Save to the database in the background; this never blocks or delays
+    // the WhatsApp handoff above, and any failure here is silent to the visitor.
     if (sb) {
       sb.from('bookings').insert({
         source: 'salon',
@@ -673,13 +671,9 @@ if (bookForm) {
         notes: notes || null
       }).then(function(res){
         if (res.error) console.error('Booking save failed:', res.error);
-        finishUp();
       }).catch(function(err){
         console.error('Booking save failed:', err);
-        finishUp();
       });
-    } else {
-      finishUp();
     }
   });
 }

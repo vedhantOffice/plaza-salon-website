@@ -1272,11 +1272,21 @@ function openReceiptModal(inv){
 function shortBranch(branchName, salonName){
   var b = String(branchName||'').trim(), s = String(salonName||'').trim();
   if (!b || !s) return b;
-  if (b.toLowerCase().indexOf(s.toLowerCase()) === 0) {
-    var rest = b.slice(s.length).replace(/^[\s—\-–,·]+/, '').trim();
-    return rest || b;
+  // Compare word by word ignoring punctuation, so "Plaza's Salon- For Ladies" still lines up
+  // with "Plaza's Salon — Pathankot (Main)" and we are left with just "Pathankot (Main)".
+  var norm = function(w){ return w.toLowerCase().replace(/[^a-z0-9]/g, ''); };
+  var bw = b.split(/\s+/);
+  var sw = s.split(/\s+/).map(norm).filter(Boolean);
+  var i = 0, j = 0;
+  while (i < bw.length && j < sw.length) {
+    var n = norm(bw[i]);
+    if (!n) { i++; continue; }
+    if (n !== sw[j]) break;
+    i++; j++;
   }
-  return b;
+  while (i < bw.length && !norm(bw[i])) i++;
+  var rest = bw.slice(i).join(' ').trim();
+  return rest || b;
 }
 function payLabel(m){
   m = String(m||'').toLowerCase();

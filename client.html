@@ -322,6 +322,10 @@ function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toL
 function fmtDate(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function digits(s){ return String(s||'').replace(/[^\d]/g,''); }
+// A bare "2026-09-16T15:30:00" is read as UTC by the database, which pushed every booking 5½
+// hours out. Converting through Date first sends a proper instant, so the slot the customer
+// picks is the slot the salon sees.
+function localISO(dateStr, timeStr){ return new Date(dateStr + 'T' + timeStr + ':00').toISOString(); }
 function billNo(id){ return '#' + String(id||'').replace(/-/g,'').slice(-6).toUpperCase(); }
 
 /* ---------------- AUTH ---------------- */
@@ -669,7 +673,7 @@ $('bookSaveBtn').addEventListener('click', function(){
 
   ensureClientForBranch(branchId).then(function(clientId){
     sb.from('appointments').insert({
-      branch_id: branchId, client_id: clientId, start_time: start, status: 'booked', source: 'website',
+      branch_id: branchId, client_id: clientId, start_time: localISO(date, time), status: 'booked', source: 'website',
       notes: $('bookNotes').value || null, total_amount: total
     }).select().single().then(function(ares){
       if (ares.error) { done(false, escapeHtml(ares.error.message)); return; }
@@ -771,7 +775,7 @@ function apptRow(r, canChange){
       var iso = nd + 'T' + nt + ':00';
       if (new Date(iso).getTime() < Date.now()) { showMsg(m, 'That time has already passed.', 'err'); return; }
       saveBtn.disabled = true;
-      sb.from('appointments').update({ start_time: iso, status: 'booked' }).eq('id', r.id).then(function(res){
+      sb.from('appointments').update({ start_time: localISO(nd, nt), status: 'booked' }).eq('id', r.id).then(function(res){
         saveBtn.disabled = false;
         if (res.error) { showMsg(m, escapeHtml(res.error.message), 'err'); return; }
         loadAppointments();

@@ -761,6 +761,13 @@ function fmtTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocal
 function fmtMoney(n){ return '₹' + Math.round(Number(n)||0).toLocaleString('en-IN'); }
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
+// Scrolling the page with the cursor over an open/focused <select> makes the browser change
+// its value and fire 'change' -- which silently rewrote roles and locked staff out of the app.
+// Dropping focus on wheel stops that; the dropdown still works normally when clicked.
+document.addEventListener('wheel', function(e){
+  if (e.target && e.target.tagName === 'SELECT') e.target.blur();
+}, { passive: true, capture: true });
+
 function staffAdmin(action, payload){
   return sb.auth.getSession().then(function(sess){
     var token = sess.data.session.access_token;
@@ -1799,7 +1806,14 @@ function loadPeopleTable(){
       var roleTd = tr.children[1];
       var roleSel = document.createElement('select'); roleSel.className='status';
       ['owner','manager','staff','customer'].forEach(function(r){ var o=document.createElement('option'); o.value=r; o.textContent=r; if(r===p.role) o.selected=true; roleSel.appendChild(o); });
-      roleSel.addEventListener('change', function(){ sb.from('profiles').update({role:roleSel.value}).eq('id',p.id).then(function(){ loadPeopleTable(); loadTeamTable(); }); });
+      roleSel.addEventListener('change', function(){
+        // Changing a role can lock someone out, so never do it without an explicit yes.
+        if (!confirm('Change ' + (p.full_name || 'this account') + " from '" + p.role + "' to '" + roleSel.value + "'?")) { roleSel.value = p.role; return; }
+        sb.from('profiles').update({role:roleSel.value}).eq('id',p.id).then(function(res2){
+          if (res2.error) { alert('Could not change role: ' + res2.error.message); roleSel.value = p.role; return; }
+          p.role = roleSel.value; loadPeopleTable(); loadTeamTable(); loadStaffForBranch();
+        });
+      });
       roleTd.appendChild(roleSel);
       var branchTd = tr.children[2];
       var branchSel = document.createElement('select'); branchSel.className='status';

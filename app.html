@@ -169,6 +169,7 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
       <li><button data-view="appointments">Appointments</button></li>
       <li><button data-view="clients">Clients</button></li>
       <li><button data-view="inbox">Website Enquiries</button></li>
+      <li><button data-view="loyalty">Loyalty Points</button></li>
       <li><button data-view="staff" id="navStaff" hidden>Staff & Branches</button></li>
     </ul>
 
@@ -240,6 +241,42 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
         <thead><tr><th>Received</th><th>Name</th><th>Phone</th><th>Source</th><th>Need</th><th>Preferred</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="inboxBody"></tbody>
       </table><div class="empty" id="inboxEmpty" hidden>No enquiries yet.</div></div>
+    </section>
+
+    <!-- LOYALTY POINTS -->
+    <section class="view" id="view-loyalty">
+      <h1>Loyalty Points</h1>
+      <p class="sub">Look up a customer by their ID and redeem points when they visit.</p>
+      <div class="card">
+        <div class="field">
+          <label>Customer ID (they show this from their account)</label>
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="loyaltyCodeInput" placeholder="e.g. PZ00001" style="text-transform:uppercase;" />
+            <button class="btn btn-solid" id="loyaltyLookupBtn" style="white-space:nowrap;">Look Up</button>
+          </div>
+        </div>
+        <div class="msg" id="loyaltyLookupMsg"></div>
+        <div id="loyaltyCustomerCard" hidden style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+            <div>
+              <div id="loyaltyCustName" style="font-family:var(--serif);font-size:1.2rem;"></div>
+              <div id="loyaltyCustPhone" class="muted" style="font-size:.85rem;"></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);">Balance</div>
+              <div id="loyaltyCustBalance" style="font-family:var(--serif);font-size:1.8rem;color:var(--gold-light);">0</div>
+            </div>
+          </div>
+          <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="field"><label>Points to Redeem</label>
+              <select id="redeemPoints"><option value="5">5</option><option value="10">10</option></select>
+            </div>
+            <div class="field"><label>Reward Given (optional note)</label><input type="text" id="redeemReward" placeholder="e.g. Free threading" /></div>
+          </div>
+          <div class="msg" id="redeemMsg"></div>
+          <button class="btn btn-solid" id="redeemBtn">Redeem Points</button>
+        </div>
+      </div>
     </section>
 
     <!-- STAFF & BRANCHES (owner/manager) -->
@@ -507,7 +544,7 @@ function loadAppointments(){
       var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
       var tr=document.createElement('tr');
       tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td>'+
-        '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
+        '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
         '<td>'+escapeHtml(svcNames)+'</td><td>'+escapeHtml(staffNameById(r.staff_id))+'</td><td>'+(r.total_amount?('₹'+r.total_amount):'—')+'</td><td></td>';
       var statusTd = tr.lastElementChild;
       var sel = document.createElement('select'); sel.className='status';
@@ -684,6 +721,40 @@ function convertEnquiryToClient(r){
     });
   });
 }
+
+/* ---------------- LOYALTY POINTS ---------------- */
+var loyaltyCurrent = null;
+$('loyaltyLookupBtn').addEventListener('click', function(){
+  var code = $('loyaltyCodeInput').value.trim().toUpperCase();
+  if (!code) { showMsg($('loyaltyLookupMsg'), 'Enter a customer ID.', 'err'); return; }
+  sb.rpc('lookup_customer_by_code', { p_client_code: code }).then(function(res){
+    if (res.error || !res.data || !res.data.length) {
+      showMsg($('loyaltyLookupMsg'), res.error ? res.error.message : 'No customer found with that ID.', 'err');
+      $('loyaltyCustomerCard').hidden = true;
+      return;
+    }
+    loyaltyCurrent = res.data[0];
+    $('loyaltyLookupMsg').className = 'msg';
+    $('loyaltyCustomerCard').hidden = false;
+    $('loyaltyCustName').textContent = loyaltyCurrent.full_name || 'Customer';
+    $('loyaltyCustPhone').textContent = loyaltyCurrent.phone || '';
+    $('loyaltyCustBalance').textContent = loyaltyCurrent.loyalty_points;
+    $('redeemMsg').className = 'msg';
+  });
+});
+$('redeemBtn').addEventListener('click', function(){
+  if (!loyaltyCurrent) return;
+  var points = parseInt($('redeemPoints').value, 10);
+  var reward = $('redeemReward').value.trim() || null;
+  sb.rpc('redeem_loyalty_points', { p_client_code: loyaltyCurrent.client_code, p_points: points, p_reward: reward, p_branch_id: state.viewingBranchId }).then(function(res){
+    if (res.error) { showMsg($('redeemMsg'), res.error.message, 'err'); return; }
+    var newBalance = res.data && res.data[0] ? res.data[0].new_balance : (loyaltyCurrent.loyalty_points - points);
+    loyaltyCurrent.loyalty_points = newBalance;
+    $('loyaltyCustBalance').textContent = newBalance;
+    showMsg($('redeemMsg'), 'Redeemed ' + points + ' points. New balance: ' + newBalance + '.', 'ok');
+    $('redeemReward').value = '';
+  });
+});
 
 /* ---------------- STAFF & BRANCHES ---------------- */
 function loadBranchTable(){

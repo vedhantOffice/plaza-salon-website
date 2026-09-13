@@ -217,10 +217,6 @@ function boot(){
     sb.from('profiles').select('*').eq('id', uid).single().then(function(pres){
       if (pres.error || !pres.data) { setTimeout(boot, 800); return; }
       state.profile = pres.data;
-      if (state.profile.role !== 'customer') {
-        document.querySelector('main .wrap').innerHTML = '<div class="login-card"><h1>Staff Account</h1><p>This is the customer page. Staff should use <a href="app.html">Plaza OS</a> instead.</p></div>';
-        return;
-      }
       if (!state.profile.full_name || !state.profile.phone) {
         $('profileCard').hidden = false;
         $('profName').value = state.profile.full_name || '';
@@ -245,7 +241,11 @@ $('profSaveBtn').addEventListener('click', function(){
 
 function showMain(){
   $('mainView').hidden = false;
-  $('welcomeMsg').textContent = 'Welcome back, ' + state.profile.full_name + '.';
+  var welcome = 'Welcome back, ' + state.profile.full_name + '.';
+  if (state.profile.role !== 'customer') {
+    welcome += ' You\'re viewing this as staff — this is exactly what your customers see. Use <a href="app.html" style="color:var(--gold-light);">Plaza OS</a> for the staff dashboard.';
+  }
+  $('welcomeMsg').innerHTML = welcome;
   $('loyaltyPoints').textContent = state.profile.loyalty_points || 0;
   $('loyaltyCode').textContent = state.profile.client_code || '—';
   loadBranches();

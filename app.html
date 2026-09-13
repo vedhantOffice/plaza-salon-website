@@ -191,7 +191,7 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
       <li><button data-view="dashboard" class="active">Dashboard</button></li>
       <li><button data-view="appointments">Appointments</button></li>
       <li><button data-view="billing">Billing / POS</button></li>
-      <li><button data-view="clients">Clients</button></li>
+      <li><button data-view="clients" id="navClients">Clients</button></li>
       <li><button data-view="loyalty">Loyalty Points</button></li>
       <li><button data-view="inbox">Website Enquiries</button></li>
       <li><button data-view="services" id="navServices" hidden>Services & Offers</button></li>
@@ -219,10 +219,10 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
       <p class="sub" id="dashSub">Today's snapshot.</p>
       <div class="stat-row">
         <div class="stat"><div class="n" id="statToday">0</div><div class="l">Today's Appts</div></div>
-        <div class="stat"><div class="n" id="statRevenue">₹0</div><div class="l">Today's Revenue</div></div>
-        <div class="stat"><div class="n" id="statCustomers">0</div><div class="l">Today's Customers</div></div>
+        <div class="stat" id="cardRevenue"><div class="n" id="statRevenue">₹0</div><div class="l">Today's Revenue</div></div>
+        <div class="stat" id="cardCustomers"><div class="n" id="statCustomers">0</div><div class="l">Today's Customers</div></div>
         <div class="stat"><div class="n" id="statUpcoming">0</div><div class="l">Upcoming (7d)</div></div>
-        <div class="stat"><div class="n" id="statClients">0</div><div class="l">Total Clients</div></div>
+        <div class="stat" id="cardClients"><div class="n" id="statClients">0</div><div class="l">Total Clients</div></div>
         <div class="stat"><div class="n" id="statNewEnq">0</div><div class="l">New Enquiries</div></div>
       </div>
 
@@ -810,6 +810,12 @@ function boot(){
       var isMgrUp = state.profile.role === 'owner' || state.profile.role === 'manager';
       if (isMgrUp) { $('navStaff').hidden = false; $('navServices').hidden = false; $('navHiring').hidden = false; $('navReports').hidden = false; }
       if (state.profile.role === 'owner') $('navSettings').hidden = false;
+      // Staff get a trimmed view: their own day, the schedule, billing, enquiries and loyalty.
+      // Client records and branch takings are management information, so they stay hidden.
+      if (state.profile.role === 'staff') {
+        $('navClients').hidden = true;
+        $('cardRevenue').hidden = true; $('cardCustomers').hidden = true; $('cardClients').hidden = true;
+      }
       loadBranchesThenApp();
     });
   });
@@ -872,6 +878,8 @@ function loadStaffForBranch(){
         var o2=o.cloneNode(true); invSel.appendChild(o2);
       });
     if (state.profile.role !== 'owner') { invSel.value = state.profile.id; }
+    // A staff member always bills under their own name, so it prints on the customer's receipt.
+    if (state.profile.role === 'staff') { invSel.disabled = true; }
   });
 }
 
@@ -1056,7 +1064,7 @@ function clientSearchWidget(inputEl, resultsEl, chosenEl, onPick){
           resultsEl.appendChild(d);
         });
         if (!res.data || !res.data.length) {
-          var d=document.createElement('div'); d.className='muted'; d.style.fontSize='.82rem'; d.textContent='No match — add this as a new client from the Clients tab first.';
+          var d=document.createElement('div'); d.className='muted'; d.style.fontSize='.82rem'; d.textContent = state.profile.role === 'staff' ? 'No match — bill this as a walk-in, or ask your manager to add the client.' : 'No match — add this as a new client from the Clients tab first.';
           resultsEl.appendChild(d);
         }
       });
@@ -1154,7 +1162,8 @@ $('invoiceSaveBtn').addEventListener('click', function(){
   if (!branchId) { showMsg($('invoiceMsg'),'No branch selected.','err'); return; }
   var totals = updateInvoiceTotal();
   var payload = {
-    branch_id: branchId, client_id: state.invoiceClientId, staff_id: $('invStaff').value || null,
+    branch_id: branchId, client_id: state.invoiceClientId,
+    staff_id: (state.profile.role === 'staff' ? state.profile.id : ($('invStaff').value || null)),
     subtotal: totals.subtotal, discount: totals.discount, tax_rate: totals.taxRate, tax_amount: totals.tax, total: totals.total,
     payment_method: $('invPayMethod').value, payment_status:'paid', created_by: state.profile.id
   };
@@ -1715,7 +1724,8 @@ $('staffSaveBtn').addEventListener('click', function(){
 
 function loadTeamTable(){
   sb.from('profiles').select('*').in('role',['owner','manager','staff']).order('staff_id').then(function(res){
-    var rows = res.data || [];
+    // Owners are deliberately left out -- this section is for staff and managers only.
+    var rows = (res.data || []).filter(function(p){ return p.role !== 'owner'; });
     var body = $('teamBody'); body.innerHTML='';
     rows.forEach(function(p){
       var branchName = state.branches.find(function(b){return b.id===p.branch_id;});
@@ -1783,7 +1793,7 @@ $('staffDetailSaveBtn').addEventListener('click', function(){
 function loadPeopleTable(){
   sb.from('profiles').select('*').order('created_at',{ascending:false}).then(function(res){
     var body = $('peopleBody'); body.innerHTML='';
-    (res.data||[]).forEach(function(p){
+    (res.data||[]).filter(function(p){ return p.role !== 'owner' || state.profile.role === 'owner'; }).forEach(function(p){
       var tr=document.createElement('tr');
       tr.innerHTML = '<td>'+escapeHtml(p.full_name||'—')+'</td><td></td><td></td><td>'+(p.active?'Yes':'No')+'</td>';
       var roleTd = tr.children[1];

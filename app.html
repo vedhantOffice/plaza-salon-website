@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plaza OS — Business System</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0c0c0d; --charcoal:#161513; --panel:#1c1a17; --panel2:#221f1b;
+  --gold:#c9a227; --gold-light:#e8c766; --gold-dim:#8c7a54;
+  --ivory:#f3efe6; --ivory-dim:#cfc7b4;
+  --line: rgba(201,162,39,0.28);
+  --serif: "Bodoni Moda","Times New Roman",Georgia,serif;
+  --sans: "Jost","Segoe UI",Arial,sans-serif;
+  --good:#7fae6a; --warn:#c98f27; --bad:#b25b4a;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--ivory);font-family:var(--sans);}
+a{color:var(--gold-light);}
+button{font:inherit;cursor:pointer;}
+input,select,textarea{font:inherit;}
+[hidden]{display:none !important;}
+
+/* ---------- login ---------- */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{max-width:420px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:36px 32px;text-align:center;}
+.login-card .brand{font-family:var(--serif);font-weight:700;font-size:1.7rem;margin-bottom:4px;}
+.login-card .brand span{color:var(--gold-light);}
+.login-card p{color:var(--ivory-dim);font-size:.9rem;line-height:1.6;}
+.field{margin:20px 0;text-align:left;}
+label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:8px;}
+input[type=email],input[type=text],input[type=tel],input[type=date],input[type=time],input[type=number],select,textarea{
+  width:100%;padding:11px 13px;background:var(--black);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92rem;
+}
+textarea{resize:vertical;min-height:70px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+.btn{padding:11px 18px;border-radius:6px;font-weight:600;font-size:.88rem;letter-spacing:.02em;border:1px solid var(--line);background:transparent;color:var(--ivory-dim);}
+.btn:hover{border-color:var(--gold);color:var(--ivory);}
+.btn-solid{background:var(--gold);color:var(--black);border:none;}
+.btn-solid:hover{background:var(--gold-light);color:var(--black);}
+.btn-solid:disabled{opacity:.5;}
+.btn-danger{border-color:var(--bad);color:var(--bad);}
+.btn-danger:hover{background:rgba(178,91,74,.12);}
+.btn-block{width:100%;}
+.msg{margin-top:16px;font-size:.85rem;padding:11px 13px;border-radius:6px;display:none;text-align:left;}
+.msg.ok{display:block;background:rgba(127,174,106,.12);color:#a8cf95;border:1px solid rgba(127,174,106,.3);}
+.msg.err{display:block;background:rgba(178,91,74,.12);color:#e0998a;border:1px solid rgba(178,91,74,.3);}
+
+/* ---------- app shell ---------- */
+#appShell{display:none;min-height:100vh;}
+#appShell.on{display:flex;}
+.sidebar{width:230px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar .brand{font-family:var(--serif);font-weight:700;font-size:1.25rem;margin-bottom:2px;}
+.sidebar .brand span{color:var(--gold-light);}
+.sidebar .tag{font-size:.7rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:22px;}
+.navlist{list-style:none;margin:0;padding:0;flex:1;}
+.navlist li{margin-bottom:2px;}
+.navlist button{width:100%;text-align:left;padding:10px 12px;border-radius:6px;background:transparent;border:none;color:var(--ivory-dim);font-size:.88rem;display:flex;align-items:center;gap:10px;}
+.navlist button:hover{background:rgba(201,162,39,.08);color:var(--ivory);}
+.navlist button.active{background:rgba(201,162,39,.15);color:var(--gold-light);font-weight:600;}
+.side-foot{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;font-size:.8rem;color:var(--ivory-dim);}
+.side-foot .who{color:var(--ivory);font-weight:600;margin-bottom:2px;}
+.side-foot .role{text-transform:capitalize;color:var(--gold-dim);}
+.side-foot a{display:block;margin-top:10px;font-size:.8rem;}
+.branch-switch{margin-bottom:16px;}
+.branch-switch select{font-size:.8rem;padding:8px 10px;}
+
+main.content{flex:1;padding:32px 36px;max-width:1200px;min-width:0;}
+h1{font-family:var(--serif);font-weight:700;font-size:1.7rem;margin:0 0 6px;}
+.sub{color:var(--ivory-dim);margin:0 0 26px;font-size:.92rem;}
+.view{display:none;}
+.view.active{display:block;}
+
+.stat-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px;}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 20px;min-width:120px;}
+.stat .n{font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold-light);}
+.stat .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ivory-dim);margin-top:2px;}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;}
+.toolbar .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.search{min-width:220px;}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:18px;}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
+table{width:100%;border-collapse:collapse;min-width:760px;}
+thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gold-dim);font-weight:500;padding:13px 15px;background:var(--panel);border-bottom:1px solid var(--line);white-space:nowrap;}
+tbody td{padding:13px 15px;border-bottom:1px solid var(--line);font-size:.87rem;vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(201,162,39,.04);}
+tbody tr.clickable{cursor:pointer;}
+.muted{color:var(--ivory-dim);}
+.empty{padding:50px 20px;text-align:center;color:var(--ivory-dim);}
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;}
+.pill-booked{background:rgba(201,162,39,.15);color:var(--gold-light);}
+.pill-confirmed{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-in_progress{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-completed{background:rgba(127,174,106,.25);color:#c9e6ba;}
+.pill-cancelled{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-no_show{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-owner{background:rgba(201,162,39,.2);color:var(--gold-light);}
+.pill-manager{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-staff{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-customer{background:rgba(255,255,255,.06);color:var(--ivory-dim);}
+select.status{background:var(--black);color:var(--ivory);border:1px solid var(--line);border-radius:5px;padding:6px 8px;font-size:.8rem;}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--good);border-radius:5px;color:var(--good);font-size:.78rem;text-decoration:none;white-space:nowrap;}
+.wa-btn:hover{background:rgba(127,174,106,.12);}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50;}
+.overlay.on{display:flex;}
+.modal{background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-width:520px;width:100%;padding:28px;}
+.modal h2{font-family:var(--serif);font-size:1.3rem;margin:0 0 18px;}
+.modal .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.chip{padding:6px 12px;border:1px solid var(--line);border-radius:100px;font-size:.8rem;color:var(--ivory-dim);}
+.chip.sel{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold-light);}
+.svc-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:.86rem;}
+.svc-row:last-child{border-bottom:none;}
+
+@media (max-width:860px){
+  #appShell.on{flex-direction:column;}
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap;align-items:center;padding:14px 16px;gap:10px;}
+  .sidebar .brand,.sidebar .tag{display:none;}
+  .navlist{display:flex;flex-wrap:wrap;flex:1;gap:4px;}
+  .navlist li{margin:0;}
+  .side-foot{display:none;}
+  main.content{padding:20px 16px;}
+  .modal .row2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="brand">Plaza <span>OS</span></div>
+    <p>Business system for Plaza's Salon. Enter your email to get a secure sign-in link — no password needed.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email" />
+      </div>
+      <button type="submit" class="btn btn-solid btn-block" id="loginBtn">Send Sign-In Link</button>
+    </form>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <aside class="sidebar">
+    <div class="brand">Plaza <span>OS</span></div>
+    <div class="tag">Business System</div>
+
+    <div class="branch-switch" id="branchSwitchWrap" hidden>
+      <label>Viewing Branch</label>
+      <select id="branchSwitch"></select>
+    </div>
+
+    <ul class="navlist" id="navList">
+      <li><button data-view="dashboard" class="active">Dashboard</button></li>
+      <li><button data-view="appointments">Appointments</button></li>
+      <li><button data-view="clients">Clients</button></li>
+      <li><button data-view="inbox">Website Enquiries</button></li>
+      <li><button data-view="staff" id="navStaff" hidden>Staff & Branches</button></li>
+    </ul>
+
+    <div class="side-foot">
+      <div class="who" id="whoName">—</div>
+      <div class="role" id="whoRole">—</div>
+      <a href="index.html">← Salon Site</a>
+      <a href="#" id="signOutLink">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <h1>Dashboard</h1>
+      <p class="sub" id="dashSub">Today's snapshot.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="statToday">0</div><div class="l">Today's Appts</div></div>
+        <div class="stat"><div class="n" id="statUpcoming">0</div><div class="l">Upcoming (7d)</div></div>
+        <div class="stat"><div class="n" id="statClients">0</div><div class="l">Total Clients</div></div>
+        <div class="stat"><div class="n" id="statNewEnq">0</div><div class="l">New Enquiries</div></div>
+      </div>
+      <div class="card">
+        <h2 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 14px;">Today's Appointments</h2>
+        <div class="table-wrap"><table id="todayTable">
+          <thead><tr><th>Time</th><th>Client</th><th>Service</th><th>Staff</th><th>Status</th></tr></thead>
+          <tbody id="todayBody"></tbody>
+        </table><div class="empty" id="todayEmpty" hidden>Nothing booked for today yet.</div></div>
+      </div>
+    </section>
+
+    <!-- APPOINTMENTS -->
+    <section class="view" id="view-appointments">
+      <h1>Appointments</h1>
+      <p class="sub">Book & manage appointments across the day.</p>
+      <div class="toolbar">
+        <div class="left">
+          <input type="date" id="apptDateFilter" />
+          <button class="btn" id="apptTodayBtn">Today</button>
+        </div>
+        <button class="btn btn-solid" id="newApptBtn">+ New Appointment</button>
+      </div>
+      <div class="table-wrap"><table id="apptTable">
+        <thead><tr><th>Time</th><th>Client</th><th>Phone</th><th>Service(s)</th><th>Staff</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody id="apptBody"></tbody>
+      </table><div class="empty" id="apptEmpty" hidden>No appointments for this date.</div></div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section class="view" id="view-clients">
+      <h1>Clients</h1>
+      <p class="sub">Client profiles, history & loyalty.</p>
+      <div class="toolbar">
+        <input type="text" class="search" id="clientSearch" placeholder="Search name or phone…" />
+        <button class="btn btn-solid" id="newClientBtn">+ Add Client</button>
+      </div>
+      <div class="table-wrap"><table id="clientTable">
+        <thead><tr><th>Name</th><th>Phone</th><th>Tags</th><th>Loyalty Pts</th><th>Added</th></tr></thead>
+        <tbody id="clientBody"></tbody>
+      </table><div class="empty" id="clientEmpty" hidden>No clients yet — add your first one.</div></div>
+    </section>
+
+    <!-- WEBSITE ENQUIRIES (legacy bookings inbox) -->
+    <section class="view" id="view-inbox">
+      <h1>Website Enquiries</h1>
+      <p class="sub">Everything submitted through the Book Now form on the salon & academy sites.</p>
+      <div class="table-wrap"><table id="inboxTable">
+        <thead><tr><th>Received</th><th>Name</th><th>Phone</th><th>Source</th><th>Need</th><th>Preferred</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="inboxBody"></tbody>
+      </table><div class="empty" id="inboxEmpty" hidden>No enquiries yet.</div></div>
+    </section>
+
+    <!-- STAFF & BRANCHES (owner/manager) -->
+    <section class="view" id="view-staff">
+      <h1>Staff & Branches</h1>
+      <p class="sub">Manage branches, franchises, and who has access.</p>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:14px;">
+          <h2 style="font-family:var(--serif);font-size:1.1rem;margin:0;">Branches</h2>
+          <button class="btn btn-solid" id="newBranchBtn">+ Add Branch / Franchise</button>
+        </div>
+        <div class="table-wrap"><table id="branchTable">
+          <thead><tr><th>Name</th><th>Code</th><th>Type</th><th>Active</th></tr></thead>
+          <tbody id="branchBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 14px;">People</h2>
+        <p class="sub" style="margin-bottom:14px;">Anyone who has ever signed in shows up here as a customer by default — promote them to staff/manager and assign a branch to give them access.</p>
+        <div class="table-wrap"><table id="peopleTable">
+          <thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Active</th></tr></thead>
+          <tbody id="peopleBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: New/Edit Client -->
+<div class="overlay" id="clientModal">
+  <div class="modal">
+    <h2 id="clientModalTitle">Add Client</h2>
+    <input type="hidden" id="clientId" />
+    <div class="field"><label>Full Name</label><input type="text" id="clientName" required /></div>
+    <div class="row2">
+      <div class="field"><label>Phone</label><input type="tel" id="clientPhone" required /></div>
+      <div class="field"><label>Email</label><input type="text" id="clientEmail" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Date of Birth</label><input type="date" id="clientDob" /></div>
+      <div class="field"><label>Gender</label>
+        <select id="clientGender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="clientNotes"></textarea></div>
+    <div class="msg" id="clientMsg"></div>
+    <div class="actions">
+      <button class="btn" id="clientCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="clientSaveBtn">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Appointment -->
+<div class="overlay" id="apptModal">
+  <div class="modal">
+    <h2>New Appointment</h2>
+    <div class="field">
+      <label>Client (search by name/phone)</label>
+      <input type="text" id="apptClientSearch" placeholder="Start typing…" />
+      <div id="apptClientResults" style="margin-top:6px;"></div>
+      <div id="apptClientChosen" class="chip sel" style="display:inline-block;margin-top:8px;" hidden></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Date</label><input type="date" id="apptDate" required /></div>
+      <div class="field"><label>Time</label><input type="time" id="apptTime" required /></div>
+    </div>
+    <div class="field"><label>Staff</label><select id="apptStaff"><option value="">Unassigned</option></select></div>
+    <div class="field">
+      <label>Services</label>
+      <div class="chip-list" id="apptServiceChips"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="apptNotes"></textarea></div>
+    <div class="msg" id="apptMsg"></div>
+    <div class="actions">
+      <button class="btn" id="apptCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="apptSaveBtn">Book Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Branch -->
+<div class="overlay" id="branchModal">
+  <div class="modal">
+    <h2>Add Branch / Franchise</h2>
+    <div class="field"><label>Name</label><input type="text" id="branchName" placeholder="e.g. Plaza's Salon — Amritsar" /></div>
+    <div class="field"><label>Code (short, unique)</label><input type="text" id="branchCode" placeholder="e.g. amritsar-01" /></div>
+    <div class="field"><label>Address</label><input type="text" id="branchAddress" /></div>
+    <div class="field"><label>Type</label>
+      <select id="branchType"><option value="false">Owned Branch</option><option value="true">Franchise</option></select>
+    </div>
+    <div class="field" id="franchiseOwnerField" hidden><label>Franchise Owner Name</label><input type="text" id="branchOwnerName" /></div>
+    <div class="msg" id="branchMsg"></div>
+    <div class="actions">
+      <button class="btn" id="branchCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="branchSaveBtn">Add Branch</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var state = { profile:null, branches:[], services:[], staffList:[], viewingBranchId:null, clients:[], chosenClientId:null, chosenServiceIds:[] };
+
+function $(id){ return document.getElementById(id); }
+function showMsg(el, text, kind){ el.textContent = text; el.className = 'msg ' + kind; }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function fmtTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+/* ---------------- AUTH ---------------- */
+$('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = $('loginEmail').value.trim();
+  var btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: window.location.href } }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Send Sign-In Link';
+    if (res.error) showMsg($('loginMsg'), res.error.message, 'err');
+    else showMsg($('loginMsg'), 'Check ' + email + ' for a sign-in link, then open it on this device.', 'ok');
+  });
+});
+$('signOutLink').addEventListener('click', function(e){ e.preventDefault(); sb.auth.signOut().then(function(){ window.location.reload(); }); });
+
+sb.auth.getSession().then(function(res){ if (res.data && res.data.session) boot(); else showLogin(); });
+sb.auth.onAuthStateChange(function(event, session){ if (session) boot(); else showLogin(); });
+
+function showLogin(){ $('loginView').style.display='flex'; $('appShell').classList.remove('on'); }
+
+function boot(){
+  $('loginView').style.display='none';
+  $('appShell').classList.add('on');
+  sb.auth.getUser().then(function(res){
+    var uid = res.data.user.id;
+    sb.from('profiles').select('*').eq('id', uid).single().then(function(pres){
+      if (pres.error || !pres.data) { setTimeout(boot, 800); return; } // trigger may still be creating the row
+      state.profile = pres.data;
+      $('whoName').textContent = state.profile.full_name || res.data.user.email;
+      $('whoRole').textContent = state.profile.role;
+      if (state.profile.role === 'customer') {
+        document.body.innerHTML = '<div class="login-wrap"><div class="login-card"><div class="brand">Plaza <span>OS</span></div><p>Your account isn\'t set up for staff access yet. Ask an owner or manager to give you access.</p></div></div>';
+        return;
+      }
+      if (state.profile.role === 'owner' || state.profile.role === 'manager') $('navStaff').hidden = false;
+      loadBranchesThenApp();
+    });
+  });
+}
+
+function loadBranchesThenApp(){
+  sb.from('branches').select('*').order('created_at').then(function(res){
+    state.branches = res.data || [];
+    if (state.profile.role === 'owner') {
+      $('branchSwitchWrap').hidden = false;
+      var sel = $('branchSwitch');
+      sel.innerHTML = '';
+      state.branches.forEach(function(b){
+        var opt = document.createElement('option'); opt.value = b.id; opt.textContent = b.name; sel.appendChild(opt);
+      });
+      state.viewingBranchId = state.branches[0] ? state.branches[0].id : null;
+      sel.value = state.viewingBranchId;
+      sel.addEventListener('change', function(){ state.viewingBranchId = sel.value; refreshAll(); });
+    } else {
+      state.viewingBranchId = state.profile.branch_id;
+    }
+    loadServices();
+    loadStaffForBranch();
+    refreshAll();
+  });
+}
+
+function loadServices(){
+  sb.from('services').select('*').eq('active', true).order('category').then(function(res){ state.services = res.data || []; });
+}
+function loadStaffForBranch(){
+  var q = sb.from('profiles').select('*').in('role', ['owner','manager','staff']);
+  sb.from('profiles').select('*').in('role',['owner','manager','staff']).then(function(res){
+    state.staffList = res.data || [];
+    var sel = $('apptStaff');
+    sel.innerHTML = '<option value="">Unassigned</option>';
+    state.staffList.filter(function(p){ return state.profile.role==='owner' || p.branch_id===state.viewingBranchId || p.role==='owner'; })
+      .forEach(function(p){ var o=document.createElement('option'); o.value=p.id; o.textContent=(p.full_name||'Staff')+' ('+p.role+')'; sel.appendChild(o); });
+  });
+}
+
+function refreshAll(){
+  loadDashboard(); loadAppointments(); loadClients(); loadInbox();
+  if (state.profile.role==='owner' || state.profile.role==='manager') { loadBranchTable(); loadPeopleTable(); }
+}
+
+/* ---------------- NAV ---------------- */
+document.querySelectorAll('#navList button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#navList button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    $('view-' + btn.dataset.view).classList.add('active');
+  });
+});
+
+/* ---------------- DASHBOARD ---------------- */
+function loadDashboard(){
+  var bid = state.viewingBranchId;
+  var today = todayStr();
+  var todayStart = today + 'T00:00:00';
+  var todayEnd = today + 'T23:59:59';
+  var weekEnd = new Date(Date.now()+7*86400000).toISOString();
+
+  var apQ = sb.from('appointments').select('*, clients(full_name,phone)').gte('start_time', todayStart).lte('start_time', todayEnd).order('start_time');
+  if (state.profile.role !== 'owner') apQ = apQ.eq('branch_id', bid); else if (bid) apQ = apQ.eq('branch_id', bid);
+  apQ.then(function(res){
+    var rows = res.data || [];
+    $('statToday').textContent = rows.length;
+    var body = $('todayBody'); body.innerHTML = '';
+    if (!rows.length) { $('todayEmpty').hidden=false; $('todayTable').hidden=true; }
+    else {
+      $('todayEmpty').hidden=true; $('todayTable').hidden=false;
+      rows.forEach(function(r){
+        var staffName = staffNameById(r.staff_id);
+        var tr=document.createElement('tr');
+        tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td><td class="muted">—</td><td>'+escapeHtml(staffName)+'</td><td><span class="pill pill-'+r.status+'">'+r.status.replace('_',' ')+'</span></td>';
+        body.appendChild(tr);
+      });
+    }
+  });
+
+  var upQ = sb.from('appointments').select('id', {count:'exact', head:true}).gte('start_time', new Date().toISOString()).lte('start_time', weekEnd);
+  if (bid) upQ = upQ.eq('branch_id', bid);
+  upQ.then(function(res){ $('statUpcoming').textContent = res.count || 0; });
+
+  var clQ = sb.from('clients').select('id', {count:'exact', head:true});
+  if (bid) clQ = clQ.eq('branch_id', bid);
+  clQ.then(function(res){ $('statClients').textContent = res.count || 0; });
+
+  sb.from('bookings').select('id',{count:'exact',head:true}).eq('status','new').then(function(res){ $('statNewEnq').textContent = res.count || 0; });
+}
+
+function staffNameById(id){ if(!id) return '—'; var p = state.staffList.find(function(x){return x.id===id;}); return p ? (p.full_name||'Staff') : '—'; }
+
+/* ---------------- APPOINTMENTS ---------------- */
+$('apptDateFilter').value = todayStr();
+$('apptTodayBtn').addEventListener('click', function(){ $('apptDateFilter').value = todayStr(); loadAppointments(); });
+$('apptDateFilter').addEventListener('change', loadAppointments);
+
+function loadAppointments(){
+  var date = $('apptDateFilter').value || todayStr();
+  var start = date + 'T00:00:00';
+  var end = date + 'T23:59:59';
+  var q = sb.from('appointments').select('*, clients(full_name,phone), appointment_services(price, services(name))').gte('start_time', start).lte('start_time', end).order('start_time');
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  q.then(function(res){
+    var rows = res.data || [];
+    var body = $('apptBody'); body.innerHTML='';
+    if (!rows.length) { $('apptEmpty').hidden=false; $('apptTable').hidden=true; return; }
+    $('apptEmpty').hidden=true; $('apptTable').hidden=false;
+    rows.forEach(function(r){
+      var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td>'+
+        '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
+        '<td>'+escapeHtml(svcNames)+'</td><td>'+escapeHtml(staffNameById(r.staff_id))+'</td><td>'+(r.total_amount?('₹'+r.total_amount):'—')+'</td><td></td>';
+      var statusTd = tr.lastElementChild;
+      var sel = document.createElement('select'); sel.className='status';
+      ['booked','confirmed','in_progress','completed','cancelled','no_show'].forEach(function(s){
+        var o=document.createElement('option'); o.value=s; o.textContent=s.replace('_',' '); if(s===r.status) o.selected=true; sel.appendChild(o);
+      });
+      sel.addEventListener('change', function(){
+        sb.from('appointments').update({status:sel.value}).eq('id',r.id).then(function(res2){
+          if (res2.error) alert('Could not update: '+res2.error.message); else loadDashboard();
+        });
+      });
+      statusTd.appendChild(sel);
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* New appointment modal */
+$('newApptBtn').addEventListener('click', function(){
+  state.chosenClientId = null; state.chosenServiceIds = [];
+  $('apptClientSearch').value=''; $('apptClientResults').innerHTML=''; $('apptClientChosen').hidden=true;
+  $('apptDate').value = $('apptDateFilter').value || todayStr(); $('apptTime').value='';
+  $('apptNotes').value=''; $('apptMsg').className='msg';
+  var chips = $('apptServiceChips'); chips.innerHTML='';
+  state.services.forEach(function(s){
+    var c=document.createElement('div'); c.className='chip'; c.textContent=s.name+' · ₹'+s.price; c.dataset.id=s.id;
+    c.addEventListener('click', function(){
+      c.classList.toggle('sel');
+      var idx = state.chosenServiceIds.indexOf(s.id);
+      if (idx>-1) state.chosenServiceIds.splice(idx,1); else state.chosenServiceIds.push(s.id);
+    });
+    chips.appendChild(c);
+  });
+  loadStaffForBranch();
+  $('apptModal').classList.add('on');
+});
+$('apptCancelBtn').addEventListener('click', function(){ $('apptModal').classList.remove('on'); });
+
+var clientSearchTimer;
+$('apptClientSearch').addEventListener('input', function(){
+  clearTimeout(clientSearchTimer);
+  var term = this.value.trim();
+  if (term.length<2) { $('apptClientResults').innerHTML=''; return; }
+  clientSearchTimer = setTimeout(function(){
+    var q = sb.from('clients').select('id,full_name,phone').or('full_name.ilike.%'+term+'%,phone.ilike.%'+term+'%').limit(6);
+    if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+    q.then(function(res){
+      var box = $('apptClientResults'); box.innerHTML='';
+      (res.data||[]).forEach(function(c){
+        var d=document.createElement('div'); d.className='chip'; d.style.cursor='pointer'; d.style.display='inline-block'; d.style.marginRight='6px'; d.style.marginBottom='6px';
+        d.textContent = c.full_name+' · '+c.phone;
+        d.addEventListener('click', function(){
+          state.chosenClientId = c.id;
+          $('apptClientChosen').hidden=false; $('apptClientChosen').textContent='Selected: '+c.full_name+' ('+c.phone+')';
+          box.innerHTML=''; $('apptClientSearch').value='';
+        });
+        box.appendChild(d);
+      });
+      if (!res.data || !res.data.length) {
+        var d=document.createElement('div'); d.className='muted'; d.style.fontSize='.82rem'; d.textContent='No match — you can add this as a new client from the Clients tab first.';
+        box.appendChild(d);
+      }
+    });
+  }, 300);
+});
+
+$('apptSaveBtn').addEventListener('click', function(){
+  if (!state.chosenClientId) { showMsg($('apptMsg'),'Pick a client first.','err'); return; }
+  if (!$('apptDate').value || !$('apptTime').value) { showMsg($('apptMsg'),'Pick date & time.','err'); return; }
+  var branchId = state.viewingBranchId;
+  if (!branchId) { showMsg($('apptMsg'),'No branch selected.','err'); return; }
+  var start = $('apptDate').value+'T'+$('apptTime').value+':00';
+  var total = state.services.filter(function(s){return state.chosenServiceIds.indexOf(s.id)>-1;}).reduce(function(a,s){return a+Number(s.price);},0);
+  sb.from('appointments').insert({
+    branch_id: branchId, client_id: state.chosenClientId, staff_id: $('apptStaff').value || null,
+    start_time: start, status:'booked', source:'staff', notes: $('apptNotes').value||null, total_amount: total,
+    created_by: state.profile.id
+  }).select().single().then(function(res){
+    if (res.error) { showMsg($('apptMsg'), res.error.message, 'err'); return; }
+    var apptId = res.data.id;
+    var rows = state.chosenServiceIds.map(function(sid){
+      var svc = state.services.find(function(s){return s.id===sid;});
+      return { appointment_id: apptId, service_id: sid, price: svc?svc.price:0 };
+    });
+    var after = function(){ $('apptModal').classList.remove('on'); loadAppointments(); loadDashboard(); };
+    if (rows.length) sb.from('appointment_services').insert(rows).then(after); else after();
+  });
+});
+
+/* ---------------- CLIENTS ---------------- */
+function loadClients(term){
+  var q = sb.from('clients').select('*').order('created_at',{ascending:false});
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  if (term) q = q.or('full_name.ilike.%'+term+'%,phone.ilike.%'+term+'%');
+  q.then(function(res){
+    state.clients = res.data || [];
+    var body = $('clientBody'); body.innerHTML='';
+    if (!state.clients.length) { $('clientEmpty').hidden=false; $('clientTable').hidden=true; return; }
+    $('clientEmpty').hidden=true; $('clientTable').hidden=false;
+    state.clients.forEach(function(c){
+      var tr=document.createElement('tr'); tr.className='clickable';
+      tr.innerHTML = '<td>'+escapeHtml(c.full_name)+'</td><td>'+escapeHtml(c.phone)+'</td><td class="muted">'+((c.tags||[]).join(', ')||'—')+'</td><td>'+c.loyalty_points+'</td><td class="muted">'+fmtDateTime(c.created_at)+'</td>';
+      tr.addEventListener('click', function(){ openClientModal(c); });
+      body.appendChild(tr);
+    });
+  });
+}
+var clientSearchTimer2;
+$('clientSearch').addEventListener('input', function(){
+  clearTimeout(clientSearchTimer2);
+  var v = this.value.trim();
+  clientSearchTimer2 = setTimeout(function(){ loadClients(v); }, 300);
+});
+
+function openClientModal(c){
+  $('clientModalTitle').textContent = c ? 'Edit Client' : 'Add Client';
+  $('clientId').value = c ? c.id : '';
+  $('clientName').value = c ? c.full_name : '';
+  $('clientPhone').value = c ? c.phone : '';
+  $('clientEmail').value = c && c.email ? c.email : '';
+  $('clientDob').value = c && c.dob ? c.dob : '';
+  $('clientGender').value = c && c.gender ? c.gender : '';
+  $('clientNotes').value = c && c.notes ? c.notes : '';
+  $('clientMsg').className='msg';
+  $('clientModal').classList.add('on');
+}
+$('newClientBtn').addEventListener('click', function(){ openClientModal(null); });
+$('clientCancelBtn').addEventListener('click', function(){ $('clientModal').classList.remove('on'); });
+$('clientSaveBtn').addEventListener('click', function(){
+  var name = $('clientName').value.trim(), phone = $('clientPhone').value.trim();
+  if (!name || !phone) { showMsg($('clientMsg'),'Name and phone are required.','err'); return; }
+  var payload = { full_name:name, phone:phone, email:$('clientEmail').value.trim()||null, dob:$('clientDob').value||null, gender:$('clientGender').value||null, notes:$('clientNotes').value||null };
+  var id = $('clientId').value;
+  var p;
+  if (id) p = sb.from('clients').update(payload).eq('id', id);
+  else { payload.branch_id = state.viewingBranchId; payload.created_by = state.profile.id; p = sb.from('clients').insert(payload); }
+  p.then(function(res){
+    if (res.error) { showMsg($('clientMsg'), res.error.message, 'err'); return; }
+    $('clientModal').classList.remove('on'); loadClients(); loadDashboard();
+  });
+});
+
+/* ---------------- WEBSITE ENQUIRIES (legacy bookings) ---------------- */
+function loadInbox(){
+  sb.from('bookings').select('*').order('created_at',{ascending:false}).limit(100).then(function(res){
+    var rows = res.data || [];
+    var body = $('inboxBody'); body.innerHTML='';
+    if (!rows.length) { $('inboxEmpty').hidden=false; $('inboxTable').hidden=true; return; }
+    $('inboxEmpty').hidden=true; $('inboxTable').hidden=false;
+    rows.forEach(function(r){
+      var preferred = [r.preferred_date, r.preferred_time].filter(Boolean).join(' · ') || '—';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td class="muted">'+fmtDateTime(r.created_at)+'</td><td>'+escapeHtml(r.name)+'</td><td>'+escapeHtml(r.phone)+'</td><td><span class="pill pill-booked">'+r.source+'</span></td><td>'+escapeHtml(r.service||'—')+'</td><td class="muted">'+escapeHtml(preferred)+'</td><td></td><td></td>';
+      var statusTd = tr.children[6];
+      var sel=document.createElement('select'); sel.className='status';
+      ['new','contacted','confirmed','done','cancelled'].forEach(function(s){ var o=document.createElement('option'); o.value=s; o.textContent=s; if(s===r.status) o.selected=true; sel.appendChild(o); });
+      sel.addEventListener('change', function(){ sb.from('bookings').update({status:sel.value}).eq('id',r.id).then(loadDashboard); });
+      statusTd.appendChild(sel);
+      var actionTd = tr.lastElementChild;
+      var convBtn=document.createElement('button'); convBtn.className='btn'; convBtn.style.fontSize='.75rem'; convBtn.style.padding='6px 10px'; convBtn.textContent='→ Client';
+      convBtn.addEventListener('click', function(){ convertEnquiryToClient(r); });
+      actionTd.appendChild(convBtn);
+      body.appendChild(tr);
+    });
+  });
+}
+function convertEnquiryToClient(r){
+  if (!state.viewingBranchId) { alert('Pick a branch first.'); return; }
+  sb.from('clients').select('id').eq('phone', r.phone).eq('branch_id', state.viewingBranchId).maybeSingle().then(function(res){
+    if (res.data) { alert('Client already exists — opening Clients tab.'); document.querySelector('[data-view=clients]').click(); loadClients(); return; }
+    sb.from('clients').insert({ branch_id: state.viewingBranchId, full_name:r.name, phone:r.phone, notes:'From website enquiry: '+(r.service||''), created_by: state.profile.id }).then(function(){
+      alert('Client added — open Appointments to book their slot.');
+      loadClients();
+    });
+  });
+}
+
+/* ---------------- STAFF & BRANCHES ---------------- */
+function loadBranchTable(){
+  sb.from('branches').select('*').order('created_at').then(function(res){
+    var body = $('branchBody'); body.innerHTML='';
+    (res.data||[]).forEach(function(b){
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(b.name)+'</td><td class="muted">'+escapeHtml(b.code)+'</td><td>'+(b.is_franchise?'Franchise ('+escapeHtml(b.franchise_owner_name||'—')+')':'Owned')+'</td><td>'+(b.active?'Yes':'No')+'</td>';
+      body.appendChild(tr);
+    });
+  });
+}
+$('branchType').addEventListener('change', function(){ $('franchiseOwnerField').hidden = this.value !== 'true'; });
+$('newBranchBtn').addEventListener('click', function(){
+  $('branchName').value=''; $('branchCode').value=''; $('branchAddress').value=''; $('branchType').value='false'; $('branchOwnerName').value=''; $('franchiseOwnerField').hidden=true; $('branchMsg').className='msg';
+  $('branchModal').classList.add('on');
+});
+$('branchCancelBtn').addEventListener('click', function(){ $('branchModal').classList.remove('on'); });
+$('branchSaveBtn').addEventListener('click', function(){
+  var name=$('branchName').value.trim(), code=$('branchCode').value.trim();
+  if (!name||!code) { showMsg($('branchMsg'),'Name and code are required.','err'); return; }
+  sb.from('branches').insert({ name:name, code:code, address:$('branchAddress').value.trim()||null, is_franchise: $('branchType').value==='true', franchise_owner_name: $('branchOwnerName').value.trim()||null }).then(function(res){
+    if (res.error) { showMsg($('branchMsg'), res.error.message, 'err'); return; }
+    $('branchModal').classList.remove('on'); loadBranchesThenApp();
+  });
+});
+
+function loadPeopleTable(){
+  sb.from('profiles').select('*').order('created_at',{ascending:false}).then(function(res){
+    var body = $('peopleBody'); body.innerHTML='';
+    (res.data||[]).forEach(function(p){
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(p.full_name||'—')+'</td><td></td><td></td><td>'+(p.active?'Yes':'No')+'</td>';
+      var roleTd = tr.children[1];
+      var roleSel = document.createElement('select'); roleSel.className='status';
+      ['owner','manager','staff','customer'].forEach(function(r){ var o=document.createElement('option'); o.value=r; o.textContent=r; if(r===p.role) o.selected=true; roleSel.appendChild(o); });
+      roleSel.addEventListener('change', function(){ sb.from('profiles').update({role:roleSel.value}).eq('id',p.id).then(loadPeopleTable); });
+      roleTd.appendChild(roleSel);
+      var branchTd = tr.children[2];
+      var branchSel = document.createElement('select'); branchSel.className='status';
+      var noneOpt = document.createElement('option'); noneOpt.value=''; noneOpt.textContent='— (all/owner)'; branchSel.appendChild(noneOpt);
+      state.branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; if(p.branch_id===b.id) o.selected=true; branchSel.appendChild(o); });
+      branchSel.addEventListener('change', function(){ sb.from('profiles').update({branch_id: branchSel.value||null}).eq('id',p.id).then(loadPeopleTable); });
+      branchTd.appendChild(branchSel);
+      body.appendChild(tr);
+    });
+  });
+}
+</script>
+</body>
+</html>

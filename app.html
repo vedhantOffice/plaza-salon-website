@@ -1,4 +1,4 @@
-      <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -1181,11 +1181,27 @@ function loadClients(term){
     var body = $('clientBody'); body.innerHTML='';
     if (!state.clients.length) { $('clientEmpty').hidden=false; $('clientTable').hidden=true; return; }
     $('clientEmpty').hidden=true; $('clientTable').hidden=false;
-    state.clients.forEach(function(c){
-      var tr=document.createElement('tr'); tr.className='clickable';
-      tr.innerHTML = '<td>'+escapeHtml(c.full_name)+'</td><td>'+escapeHtml(c.phone)+'</td><td class="muted">'+((c.tags||[]).join(', ')||'—')+'</td><td>'+c.loyalty_points+'</td><td class="muted">'+fmtDateTime(c.created_at)+'</td>';
-      tr.addEventListener('click', function(){ openClientModal(c); });
-      body.appendChild(tr);
+    // Loyalty points live on the customer's online account (profiles), not on this walk-in
+    // record -- so pull the real balance for anyone who has logged in and linked their phone.
+    var userIds = state.clients.map(function(c){ return c.user_id; }).filter(Boolean);
+    var renderRows = function(pointsMap){
+      body.innerHTML='';
+      state.clients.forEach(function(c){
+        var linked = c.user_id && pointsMap[c.user_id] !== undefined;
+        var ptsCell = linked
+          ? String(pointsMap[c.user_id])
+          : '<span class="muted" title="Points only start counting once this customer signs in on the website with this same phone number">0 (not logged in)</span>';
+        var tr=document.createElement('tr'); tr.className='clickable';
+        tr.innerHTML = '<td>'+escapeHtml(c.full_name)+'</td><td>'+escapeHtml(c.phone)+'</td><td class="muted">'+((c.tags||[]).join(', ')||'—')+'</td><td>'+ptsCell+'</td><td class="muted">'+fmtDateTime(c.created_at)+'</td>';
+        tr.addEventListener('click', function(){ openClientModal(c); });
+        body.appendChild(tr);
+      });
+    };
+    if (!userIds.length) { renderRows({}); return; }
+    sb.from('profiles').select('id, loyalty_points').in('id', userIds).then(function(pres){
+      var map = {};
+      (pres.data||[]).forEach(function(p){ map[p.id] = p.loyalty_points; });
+      renderRows(map);
     });
   });
 }

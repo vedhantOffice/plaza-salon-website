@@ -259,11 +259,12 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
         <div class="left">
           <input type="date" id="apptDateFilter" />
           <button class="btn" id="apptTodayBtn">Today</button>
+          <input type="text" class="search" id="apptSearch" placeholder="Search name, phone or customer ID…" />
         </div>
         <button class="btn btn-solid" id="newApptBtn">+ New Appointment</button>
       </div>
       <div class="table-wrap"><table id="apptTable">
-        <thead><tr><th>Time</th><th>Client</th><th>Phone</th><th>Service(s)</th><th>Staff</th><th>Amount</th><th>Status</th></tr></thead>
+        <thead><tr><th>Time</th><th>Client</th><th>Phone</th><th>Service(s)</th><th>Staff</th><th>Amount</th><th>Status</th><th>Bill</th></tr></thead>
         <tbody id="apptBody"></tbody>
       </table><div class="empty" id="apptEmpty" hidden>No appointments for this date.</div></div>
     </section>
@@ -333,7 +334,7 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
             </div>
             <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
               <div class="field"><label>Points to Redeem</label>
-                <select id="redeemPoints"><option value="5">5</option><option value="10">10</option></select>
+                <select id="redeemPoints"></select>
               </div>
               <div class="field"><label>Reward Given (optional note)</label><input type="text" id="redeemReward" placeholder="e.g. Free threading" /></div>
             </div>
@@ -482,6 +483,11 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
         <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div class="field"><label>₹ Spent</label><input type="number" id="setLoyaltyRupees" /></div>
           <div class="field"><label>Points Earned</label><input type="number" id="setLoyaltyPoints" /></div>
+        </div>
+        <div class="field">
+          <label>Rewards — one per line, as points = what they get</label>
+          <textarea id="setRewards" rows="3" placeholder="5 = Free eyebrow threading&#10;10 = 20% off your next service"></textarea>
+          <p class="sub" style="margin:8px 0 0;font-size:.8rem;">Customers see these on their account page, and these are the options staff pick from when redeeming.</p>
         </div>
         <div class="msg" id="settingsLoyMsg"></div>
         <button class="btn btn-solid" id="saveLoyaltyBtn">Save</button>
@@ -751,7 +757,8 @@ var EDGE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co/functions/v1/staff-admi
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var state = { profile:null, branches:[], services:[], offers:[], products:[], staffList:[], viewingBranchId:null, clients:[],
-  chosenClientId:null, chosenServiceIds:[], invoiceItems:[], invoiceClientId:null, settings:{}, candidates:[] };
+  chosenClientId:null, chosenServiceIds:[], invoiceItems:[], invoiceClientId:null, settings:{}, candidates:[],
+  apptRows:[], apptBilled:{}, apptCodes:{}, billingApptId:null, pendingInvStaffId:null };
 
 function $(id){ return document.getElementById(id); }
 function showMsg(el, text, kind){ el.textContent = text; el.className = 'msg ' + kind; }
@@ -871,7 +878,43 @@ function loadSettings(){
     var salon = state.settings.salon_info || {name:"Plaza's Salon", gst_rate:18};
     $('setSalonName').value = salon.name; $('setGstRate').value = salon.gst_rate;
     $('invTaxRate').value = salon.gst_rate || 0;
+    renderRewardSettings();
   });
+}
+
+// The reward tiers are shared: customers see them on their account page and staff redeem against
+// them here, so both sides always describe the same thing.
+function renderRewardSettings(){
+  var rewards = state.settings.loyalty_rewards || [];
+  $('setRewards').value = rewards.map(function(r){ return r.points + ' = ' + (r.reward||''); }).join('\n');
+  var sel = $('redeemPoints'); sel.innerHTML = '';
+  if (!rewards.length) {
+    [5,10].forEach(function(p){ var o=document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o); });
+    return;
+  }
+  rewards.forEach(function(r){
+    var o=document.createElement('option'); o.value=r.points;
+    o.textContent = r.points + ' — ' + (r.reward||'');
+    o.dataset.reward = r.reward || '';
+    sel.appendChild(o);
+  });
+  // assigned, not added, so re-reading settings never stacks up duplicate handlers
+  sel.onchange = function(){
+    var opt = sel.options[sel.selectedIndex];
+    if (opt && opt.dataset.reward) $('redeemReward').value = opt.dataset.reward;
+  };
+  if (sel.options[0] && sel.options[0].dataset.reward) $('redeemReward').value = sel.options[0].dataset.reward;
+}
+
+function parseRewards(text){
+  return String(text||'').split('\n').map(function(line){
+    var m = line.split('=');
+    if (m.length < 2) return null;
+    var pts = parseInt(String(m[0]).replace(/[^\d]/g,''), 10);
+    var reward = m.slice(1).join('=').trim();
+    if (!pts || !reward) return null;
+    return { points: pts, reward: reward };
+  }).filter(Boolean).sort(function(a,b){ return a.points - b.points; });
 }
 function loadStaffForBranch(){
   sb.from('profiles').select('*').in('role',['owner','manager','staff']).then(function(res){
@@ -885,6 +928,9 @@ function loadStaffForBranch(){
         var o2=o.cloneNode(true); invSel.appendChild(o2);
       });
     if (state.profile.role !== 'owner') { invSel.value = state.profile.id; }
+    // Billing from a booking keeps whoever the appointment was assigned to.
+    if (state.pendingInvStaffId && state.profile.role !== 'staff') { invSel.value = state.pendingInvStaffId; }
+    state.pendingInvStaffId = null;
     // A staff member always bills under their own name, so it prints on the customer's receipt.
     if (state.profile.role === 'staff') { invSel.disabled = true; }
   });
@@ -994,38 +1040,103 @@ function staffNameById(id){ if(!id) return '—'; var p = state.staffList.find(f
 $('apptDateFilter').value = todayStr();
 $('apptTodayBtn').addEventListener('click', function(){ $('apptDateFilter').value = todayStr(); loadAppointments(); });
 $('apptDateFilter').addEventListener('change', loadAppointments);
+// Filtering happens on the rows already loaded, so searching stays instant during a rush.
+$('apptSearch').addEventListener('input', function(){ renderAppointments(); });
 
 function loadAppointments(){
   var date = $('apptDateFilter').value || todayStr();
   var start = date + 'T00:00:00';
   var end = date + 'T23:59:59';
-  var q = sb.from('appointments').select('*, clients(full_name,phone), appointment_services(price, services(name))').gte('start_time', start).lte('start_time', end).order('start_time');
+  var q = sb.from('appointments').select('*, clients(full_name,phone,user_id), appointment_services(service_id, price, services(name))').gte('start_time', start).lte('start_time', end).order('start_time');
   if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
   q.then(function(res){
     var rows = res.data || [];
-    var body = $('apptBody'); body.innerHTML='';
-    if (!rows.length) { $('apptEmpty').hidden=false; $('apptTable').hidden=true; return; }
-    $('apptEmpty').hidden=true; $('apptTable').hidden=false;
-    rows.forEach(function(r){
-      var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
-      var tr=document.createElement('tr');
-      tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td>'+
-        '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
-        '<td>'+escapeHtml(svcNames)+'</td><td>'+escapeHtml(staffNameById(r.staff_id))+'</td><td>'+(r.total_amount?(fmtMoney(r.total_amount)):'—')+'</td><td></td>';
-      var statusTd = tr.lastElementChild;
-      var sel = document.createElement('select'); sel.className='status';
-      ['booked','confirmed','in_progress','completed','cancelled','no_show'].forEach(function(s){
-        var o=document.createElement('option'); o.value=s; o.textContent=s.replace('_',' '); if(s===r.status) o.selected=true; sel.appendChild(o);
-      });
-      sel.addEventListener('change', function(){
-        sb.from('appointments').update({status:sel.value}).eq('id',r.id).then(function(res2){
-          if (res2.error) alert('Could not update: '+res2.error.message); else loadDashboard();
-        });
-      });
-      statusTd.appendChild(sel);
-      body.appendChild(tr);
+    state.apptRows = rows;
+    var apptIds = rows.map(function(r){ return r.id; });
+    var userIds = rows.map(function(r){ return r.clients && r.clients.user_id; }).filter(Boolean);
+    // Which of these already have a bill, and what each customer's ID is, so staff can find a
+    // booking by the ID the customer reads out and cannot bill the same visit twice.
+    var billedQ = apptIds.length ? sb.from('invoices').select('id, appointment_id').in('appointment_id', apptIds) : Promise.resolve({data:[]});
+    var codeQ = userIds.length ? sb.from('profiles').select('id, client_code').in('id', userIds) : Promise.resolve({data:[]});
+    Promise.all([billedQ, codeQ]).then(function(extra){
+      state.apptBilled = {};
+      (extra[0].data||[]).forEach(function(i){ if (i.appointment_id) state.apptBilled[i.appointment_id] = i.id; });
+      state.apptCodes = {};
+      (extra[1].data||[]).forEach(function(p){ state.apptCodes[p.id] = p.client_code; });
+      renderAppointments();
     });
   });
+}
+
+function renderAppointments(){
+  var rows = state.apptRows || [];
+  var term = ($('apptSearch').value || '').trim().toLowerCase();
+  if (term) {
+    rows = rows.filter(function(r){
+      var name = (r.clients && r.clients.full_name || '').toLowerCase();
+      var phone = (r.clients && r.clients.phone || '').toLowerCase();
+      var code = ((r.clients && state.apptCodes[r.clients.user_id]) || '').toLowerCase();
+      return name.indexOf(term) > -1 || phone.indexOf(term) > -1 || (code && code.indexOf(term) > -1);
+    });
+  }
+  var body = $('apptBody'); body.innerHTML='';
+  if (!rows.length) { $('apptEmpty').hidden=false; $('apptTable').hidden=true; return; }
+  $('apptEmpty').hidden=true; $('apptTable').hidden=false;
+  rows.forEach(function(r){
+    var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
+    var code = (r.clients && state.apptCodes[r.clients.user_id]) || '';
+    var tr=document.createElement('tr');
+    tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+
+      (code ? '<br><span class="muted" style="font-size:.75rem;">'+escapeHtml(code)+'</span>' : '')+'</td>'+
+      '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
+      '<td>'+escapeHtml(svcNames)+'</td><td>'+escapeHtml(staffNameById(r.staff_id))+'</td><td>'+(r.total_amount?(fmtMoney(r.total_amount)):'—')+'</td><td></td><td></td>';
+    var statusTd = tr.children[6];
+    var sel = document.createElement('select'); sel.className='status';
+    ['booked','confirmed','in_progress','completed','cancelled','no_show'].forEach(function(s){
+      var o=document.createElement('option'); o.value=s; o.textContent=s.replace('_',' '); if(s===r.status) o.selected=true; sel.appendChild(o);
+    });
+    sel.addEventListener('change', function(){
+      sb.from('appointments').update({status:sel.value}).eq('id',r.id).then(function(res2){
+        if (res2.error) alert('Could not update: '+res2.error.message); else { r.status = sel.value; loadDashboard(); }
+      });
+    });
+    statusTd.appendChild(sel);
+
+    var billTd = tr.lastElementChild;
+    if (state.apptBilled[r.id]) {
+      billTd.innerHTML = '<span class="pill pill-completed">billed</span>';
+    } else if (r.status === 'cancelled' || r.status === 'no_show') {
+      billTd.innerHTML = '<span class="muted">—</span>';
+    } else {
+      var bBtn = document.createElement('button'); bBtn.className='btn btn-sm btn-solid'; bBtn.textContent='Bill';
+      bBtn.addEventListener('click', function(){ billFromAppointment(r); });
+      billTd.appendChild(bBtn);
+    }
+    body.appendChild(tr);
+  });
+}
+
+// Open the billing screen already filled in from a booking, so a customer at the counter can be
+// billed in one step instead of re-entering everything by hand during a rush.
+function billFromAppointment(r){
+  state.invoiceItems = [];
+  state.invoiceClientId = r.client_id;
+  state.billingApptId = r.id;
+  state.pendingInvStaffId = r.staff_id || null;
+  $('invClientSearch').value=''; $('invClientResults').innerHTML='';
+  $('invClientChosen').hidden=false;
+  $('invClientChosen').textContent = 'Selected: ' + (r.clients ? r.clients.full_name + ' (' + r.clients.phone + ')' : 'Customer');
+  $('invDiscount').value=0; $('invPayMethod').value='cash'; $('invoiceMsg').className='msg';
+  (r.appointment_services||[]).forEach(function(s){
+    state.invoiceItems.push({
+      type:'service', service_id: s.service_id || null,
+      description: s.services ? s.services.name : 'Service',
+      qty: 1, price: Number(s.price) || 0
+    });
+  });
+  renderInvoiceItems();
+  loadStaffForBranch();
+  $('invoiceModal').classList.add('on');
 }
 
 /* New appointment modal */
@@ -1155,7 +1266,7 @@ $('invDiscount').addEventListener('input', updateInvoiceTotal);
 $('invTaxRate').addEventListener('input', updateInvoiceTotal);
 
 $('newInvoiceBtn').addEventListener('click', function(){
-  state.invoiceItems = []; state.invoiceClientId = null;
+  state.invoiceItems = []; state.invoiceClientId = null; state.billingApptId = null; state.pendingInvStaffId = null;
   $('invClientSearch').value=''; $('invClientResults').innerHTML=''; $('invClientChosen').hidden=true;
   $('invDiscount').value=0; $('invPayMethod').value='cash'; $('invoiceMsg').className='msg';
   renderInvoiceItems();
@@ -1172,7 +1283,8 @@ $('invoiceSaveBtn').addEventListener('click', function(){
     branch_id: branchId, client_id: state.invoiceClientId,
     staff_id: (state.profile.role === 'staff' ? state.profile.id : ($('invStaff').value || null)),
     subtotal: totals.subtotal, discount: totals.discount, tax_rate: totals.taxRate, tax_amount: totals.tax, total: totals.total,
-    payment_method: $('invPayMethod').value, payment_status:'paid', created_by: state.profile.id
+    payment_method: $('invPayMethod').value, payment_status:'paid', created_by: state.profile.id,
+    appointment_id: state.billingApptId || null
   };
   sb.from('invoices').insert(payload).select().single().then(function(res){
     if (res.error) { showMsg($('invoiceMsg'), res.error.message, 'err'); return; }
@@ -1182,9 +1294,16 @@ $('invoiceSaveBtn').addEventListener('click', function(){
     });
     sb.from('invoice_items').insert(rows).then(function(){
       $('invoiceModal').classList.remove('on');
-      loadInvoices(); loadDashboard();
-      // Show the receipt straight away so it can be sent to the customer on WhatsApp.
-      openReceiptModal(res.data);
+      var apptId = state.billingApptId;
+      state.billingApptId = null;
+      var after = function(){
+        loadInvoices(); loadDashboard();
+        // Show the receipt straight away so it can be sent to the customer on WhatsApp.
+        openReceiptModal(res.data);
+      };
+      // A booking that has just been paid for is done, so close it off automatically.
+      if (apptId) sb.from('appointments').update({ status:'completed' }).eq('id', apptId).then(function(){ loadAppointments(); after(); });
+      else after();
     });
   });
 });
@@ -1971,9 +2090,13 @@ function runReports(){
 $('saveLoyaltyBtn').addEventListener('click', function(){
   var per_rupees = Number($('setLoyaltyRupees').value)||100;
   var points = Number($('setLoyaltyPoints').value)||1;
+  var rewards = parseRewards($('setRewards').value);
   sb.from('app_settings').update({ value: {per_rupees:per_rupees, points:points} }).eq('key','loyalty_points_per_rupee').then(function(res){
     if (res.error) { showMsg($('settingsLoyMsg'), res.error.message, 'err'); return; }
-    showMsg($('settingsLoyMsg'), 'Saved.', 'ok'); loadSettings();
+    sb.from('app_settings').update({ value: rewards }).eq('key','loyalty_rewards').then(function(res2){
+      if (res2.error) { showMsg($('settingsLoyMsg'), res2.error.message, 'err'); return; }
+      showMsg($('settingsLoyMsg'), 'Saved.', 'ok'); loadSettings();
+    });
   });
 });
 $('saveSalonBtn').addEventListener('click', function(){

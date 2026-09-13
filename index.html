@@ -346,8 +346,10 @@
         <a href="#about">About</a>
         <a href="#services">Services</a>
         <a href="#book">Book</a>
+        <a href="#rewards">Rewards</a>
         <a href="#academy">Academy</a>
         <a href="#contact">Visit Us</a>
+        <a href="client.html">My Account</a>
       </div>
       <a class="btn btn-solid nav-cta" href="#book">Book Now</a>
       <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="mobileNav">
@@ -359,8 +361,10 @@
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#book">Book</a>
+      <a href="#rewards">Rewards</a>
       <a href="#academy">Academy</a>
       <a href="#contact">Visit Us</a>
+      <a href="client.html">My Account</a>
       <a href="academy.html">Hair Academy Page →</a>
       <a class="btn btn-solid" href="#book" style="margin-top:16px;justify-content:center;">Book Now</a>
     </div>
@@ -461,6 +465,7 @@
       <span class="eyebrow">Book Now</span>
       <h2>Book Your Visit</h2>
       <p>Tell us what you need — a service, or just some advice — and we'll confirm your slot on WhatsApp.</p>
+      <p style="margin-top:14px;">Have an account? <a href="client.html" style="color:var(--gold-light);">Book online instead</a> to pick your services, see the price up front and collect loyalty points.</p>
     </div>
     <form class="book-form" id="bookForm">
       <div class="form-row">
@@ -512,6 +517,41 @@
     <div class="book-success" id="bookSuccess">
       <h3>Opening WhatsApp…</h3>
       <p>If it didn't open automatically, <a id="bookFallback" href="#" target="_blank" rel="noopener" style="color:var(--gold-light);">tap here to send your request</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="rewards">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Loyalty</span>
+      <h2>Earn Points Every Visit</h2>
+      <p id="rwRate">Every time you visit us, you collect points — and they turn into something for free.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-bottom:34px;">
+      <div style="border:1px solid var(--line);border-radius:4px;padding:22px;">
+        <div style="color:var(--gold-light);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px;">Step One</div>
+        <div style="color:var(--ivory);margin-bottom:6px;font-size:1.02rem;">Create your account</div>
+        <div style="color:var(--ivory-dim);font-size:.88rem;line-height:1.65;">Takes a minute. Use the same phone number you give us at the salon and your past visits count too.</div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:4px;padding:22px;">
+        <div style="color:var(--gold-light);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px;">Step Two</div>
+        <div style="color:var(--ivory);margin-bottom:6px;font-size:1.02rem;">Visit us as usual</div>
+        <div style="color:var(--ivory-dim);font-size:.88rem;line-height:1.65;">Points are added automatically whenever we bill you. Nothing to remember, nothing to carry.</div>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:4px;padding:22px;">
+        <div style="color:var(--gold-light);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px;">Step Three</div>
+        <div style="color:var(--ivory);margin-bottom:6px;font-size:1.02rem;">Show your ID and claim</div>
+        <div style="color:var(--ivory-dim);font-size:.88rem;line-height:1.65;">Your account shows a customer ID. Read it out at the counter and we'll take the reward off your bill.</div>
+      </div>
+    </div>
+
+    <div id="rwTiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-bottom:34px;"></div>
+
+    <div style="text-align:center;">
+      <a class="btn btn-solid" href="client.html">Create Your Account</a>
+      <p style="color:var(--ivory-dim);font-size:.86rem;margin-top:14px;">Already have one? <a href="client.html" style="color:var(--gold-light);">Sign in to your account</a>.</p>
     </div>
   </div>
 </section>
@@ -609,6 +649,42 @@ var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
 var sb = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 document.getElementById('yr').textContent = new Date().getFullYear();
+
+// The loyalty rate and rewards are set by the salon in Plaza OS, so read them live rather than
+// hard-coding numbers here that would quietly go out of date.
+(function(){
+  if (!sb) return;
+  var tierBox = document.getElementById('rwTiers');
+  var rateEl = document.getElementById('rwRate');
+  if (!tierBox || !rateEl) return;
+  sb.from('app_settings').select('key, value').then(function(res){
+    var map = {};
+    (res.data || []).forEach(function(r){ map[r.key] = r.value; });
+    var rate = map.loyalty_points_per_rupee;
+    if (rate && rate.per_rupees) {
+      rateEl.textContent = 'Spend ₹' + Number(rate.per_rupees).toLocaleString('en-IN') + ' and earn ' +
+        rate.points + (Number(rate.points) === 1 ? ' point' : ' points') +
+        '. Collect them up and swap them for something on the house.';
+    }
+    var tiers = map.loyalty_rewards || [];
+    tierBox.innerHTML = '';
+    tiers.forEach(function(t){
+      var d = document.createElement('div');
+      d.style.cssText = 'border:1px solid var(--line);border-radius:4px;padding:22px;text-align:center;';
+      var pts = document.createElement('div');
+      pts.style.cssText = 'font-family:var(--serif,Georgia,serif);font-size:2rem;color:var(--gold-light);line-height:1;margin-bottom:8px;';
+      pts.textContent = t.points;
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'color:var(--ivory-dim);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;';
+      lbl.textContent = Number(t.points) === 1 ? 'point' : 'points';
+      var rw = document.createElement('div');
+      rw.style.cssText = 'color:var(--ivory);font-size:.95rem;line-height:1.6;';
+      rw.textContent = t.reward || '';
+      d.appendChild(pts); d.appendChild(lbl); d.appendChild(rw);
+      tierBox.appendChild(d);
+    });
+  });
+})();
 
 var navToggle = document.getElementById('navToggle');
 var mobileNav = document.getElementById('mobileNav');

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plaza's Salon — My Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0c0c0d; --charcoal:#161513; --panel:#1c1a17; --panel2:#221f1b;
+  --gold:#c9a227; --gold-light:#e8c766; --gold-dim:#8c7a54;
+  --ivory:#f3efe6; --ivory-dim:#cfc7b4;
+  --line: rgba(201,162,39,0.28);
+  --serif: "Bodoni Moda","Times New Roman",Georgia,serif;
+  --sans: "Jost","Segoe UI",Arial,sans-serif;
+  --good:#7fae6a; --warn:#c98f27; --bad:#b25b4a;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--ivory);font-family:var(--sans);}
+a{color:var(--gold-light);}
+button{font:inherit;cursor:pointer;}
+input,select,textarea{font:inherit;}
+[hidden]{display:none !important;}
+.wrap{max-width:640px;margin:0 auto;padding:0 20px;}
+header{border-bottom:1px solid var(--line);padding:20px 0;}
+header .wrap{display:flex;align-items:center;justify-content:space-between;}
+.brand{font-family:var(--serif);font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--ivory);}
+.brand span{color:var(--gold-light);}
+nav.top a{color:var(--ivory-dim);text-decoration:none;font-size:.85rem;margin-left:16px;}
+main{padding:32px 0 60px;}
+h1{font-family:var(--serif);font-weight:700;font-size:1.6rem;margin:0 0 6px;}
+.sub{color:var(--ivory-dim);margin:0 0 24px;font-size:.92rem;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;margin-bottom:18px;}
+.field{margin:16px 0;text-align:left;}
+label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:7px;}
+input[type=email],input[type=text],input[type=tel],input[type=date],input[type=time],select,textarea{
+  width:100%;padding:11px 13px;background:var(--black);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92rem;
+}
+textarea{resize:vertical;min-height:60px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+.btn{padding:11px 18px;border-radius:6px;font-weight:600;font-size:.88rem;border:1px solid var(--line);background:transparent;color:var(--ivory-dim);}
+.btn:hover{border-color:var(--gold);color:var(--ivory);}
+.btn-solid{background:var(--gold);color:var(--black);border:none;}
+.btn-solid:hover{background:var(--gold-light);}
+.btn-solid:disabled{opacity:.5;}
+.btn-block{width:100%;}
+.msg{margin-top:14px;font-size:.85rem;padding:10px 13px;border-radius:6px;display:none;text-align:left;}
+.msg.ok{display:block;background:rgba(127,174,106,.12);color:#a8cf95;border:1px solid rgba(127,174,106,.3);}
+.msg.err{display:block;background:rgba(178,91,74,.12);color:#e0998a;border:1px solid rgba(178,91,74,.3);}
+.login-card{max-width:420px;margin:60px auto;text-align:center;}
+.login-card p{color:var(--ivory-dim);font-size:.9rem;line-height:1.6;}
+
+.loyalty-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.loyalty-points{font-family:var(--serif);font-size:2.4rem;font-weight:700;color:var(--gold-light);}
+.loyalty-code{font-family:var(--serif);font-size:1.3rem;letter-spacing:.05em;color:var(--ivory);background:var(--black);border:1px solid var(--line);border-radius:6px;padding:8px 14px;display:inline-block;}
+.tiers{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.tier{flex:1;min-width:140px;background:var(--black);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--ivory-dim);}
+.tier b{color:var(--gold-light);display:block;font-size:1rem;margin-bottom:2px;}
+
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.chip{padding:6px 12px;border:1px solid var(--line);border-radius:100px;font-size:.8rem;color:var(--ivory-dim);cursor:pointer;}
+.chip.sel{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold-light);}
+
+.appt-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:.88rem;gap:10px;}
+.appt-row:last-child{border-bottom:none;}
+.appt-row .meta{color:var(--ivory-dim);font-size:.8rem;}
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;}
+.pill-booked{background:rgba(201,162,39,.15);color:var(--gold-light);}
+.pill-confirmed{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-in_progress{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-completed{background:rgba(127,174,106,.25);color:#c9e6ba;}
+.pill-cancelled{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-no_show{background:rgba(178,91,74,.15);color:var(--bad);}
+.empty{padding:30px 0;text-align:center;color:var(--ivory-dim);font-size:.88rem;}
+.side-foot{margin-top:10px;font-size:.82rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">Plaza's <span>Salon</span></a>
+    <nav class="top">
+      <a href="index.html">Salon Site</a>
+      <a href="#" id="signOutLink" hidden>Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- LOGIN -->
+    <section id="loginView">
+      <div class="login-card">
+        <h1>My Account</h1>
+        <p>Book appointments and check your loyalty points. Enter your email to get a secure sign-in link — no password needed.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <button type="submit" class="btn btn-solid btn-block" id="loginBtn">Send Sign-In Link</button>
+        </form>
+        <div class="msg" id="loginMsg"></div>
+      </div>
+    </section>
+
+    <!-- APP -->
+    <section id="appView" hidden>
+
+      <!-- profile completion -->
+      <div class="card" id="profileCard" hidden>
+        <h1>Welcome!</h1>
+        <p class="sub">Just need your name and phone to get started.</p>
+        <div class="field"><label>Full Name</label><input type="text" id="profName" /></div>
+        <div class="field"><label>Phone</label><input type="tel" id="profPhone" /></div>
+        <div class="msg" id="profMsg"></div>
+        <button class="btn btn-solid" id="profSaveBtn">Save & Continue</button>
+      </div>
+
+      <div id="mainView" hidden>
+        <h1>My Account</h1>
+        <p class="sub" id="welcomeMsg">Welcome back.</p>
+
+        <div class="card">
+          <div class="loyalty-row">
+            <div>
+              <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:4px;">Loyalty Points</div>
+              <div class="loyalty-points" id="loyaltyPoints">0</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:4px;">Your ID — show this to redeem</div>
+              <div class="loyalty-code" id="loyaltyCode">—</div>
+            </div>
+          </div>
+          <div class="tiers">
+            <div class="tier"><b>5 points</b>Ask in-store about your reward</div>
+            <div class="tier"><b>10 points</b>Ask in-store about your reward</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;">Book an Appointment</h2>
+          <div class="field">
+            <label>Branch</label>
+            <select id="bookBranch"></select>
+          </div>
+          <div class="field">
+            <label>Services</label>
+            <div class="chip-list" id="bookServiceChips"></div>
+          </div>
+          <div class="field" style="display:flex;gap:12px;">
+            <div style="flex:1;"><label>Date</label><input type="date" id="bookDate" required /></div>
+            <div style="flex:1;"><label>Time</label><input type="time" id="bookTime" required /></div>
+          </div>
+          <div class="field"><label>Notes (optional)</label><textarea id="bookNotes"></textarea></div>
+          <div class="msg" id="bookMsg"></div>
+          <button class="btn btn-solid" id="bookSaveBtn">Request Appointment</button>
+          <p class="sub" style="margin:10px 0 0;font-size:.8rem;">Your slot is confirmed once the salon accepts it — you'll see the status update below.</p>
+        </div>
+
+        <div class="card">
+          <h2 style="font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;">My Appointments</h2>
+          <div id="apptList"></div>
+          <div class="empty" id="apptEmpty" hidden>No appointments yet — book one above.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var state = { profile:null, branches:[], services:[], chosenServiceIds:[] };
+
+function $(id){ return document.getElementById(id); }
+function showMsg(el, text, kind){ el.textContent = text; el.className = 'msg ' + kind; }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+/* ---------------- AUTH ---------------- */
+$('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = $('loginEmail').value.trim();
+  var btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: window.location.href } }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Send Sign-In Link';
+    if (res.error) showMsg($('loginMsg'), res.error.message, 'err');
+    else showMsg($('loginMsg'), 'Check ' + email + ' for a sign-in link, then open it on this device.', 'ok');
+  });
+});
+$('signOutLink').addEventListener('click', function(e){ e.preventDefault(); sb.auth.signOut().then(function(){ window.location.reload(); }); });
+
+sb.auth.getSession().then(function(res){ if (res.data && res.data.session) boot(); else showLogin(); });
+sb.auth.onAuthStateChange(function(event, session){ if (session) boot(); else showLogin(); });
+
+function showLogin(){ $('loginView').hidden = false; $('appView').hidden = true; $('signOutLink').hidden = true; }
+
+function boot(){
+  $('loginView').hidden = true;
+  $('appView').hidden = false;
+  $('signOutLink').hidden = false;
+  sb.auth.getUser().then(function(res){
+    var uid = res.data.user.id;
+    var email = res.data.user.email;
+    sb.from('profiles').select('*').eq('id', uid).single().then(function(pres){
+      if (pres.error || !pres.data) { setTimeout(boot, 800); return; }
+      state.profile = pres.data;
+      if (state.profile.role !== 'customer') {
+        document.querySelector('main .wrap').innerHTML = '<div class="login-card"><h1>Staff Account</h1><p>This is the customer page. Staff should use <a href="app.html">Plaza OS</a> instead.</p></div>';
+        return;
+      }
+      if (!state.profile.full_name || !state.profile.phone) {
+        $('profileCard').hidden = false;
+        $('profName').value = state.profile.full_name || '';
+        $('profPhone').value = state.profile.phone || '';
+      } else {
+        showMain();
+      }
+    });
+  });
+}
+
+$('profSaveBtn').addEventListener('click', function(){
+  var name = $('profName').value.trim(), phone = $('profPhone').value.trim();
+  if (!name || !phone) { showMsg($('profMsg'), 'Please enter your name and phone.', 'err'); return; }
+  sb.from('profiles').update({ full_name: name, phone: phone }).eq('id', state.profile.id).then(function(res){
+    if (res.error) { showMsg($('profMsg'), res.error.message, 'err'); return; }
+    state.profile.full_name = name; state.profile.phone = phone;
+    $('profileCard').hidden = true;
+    showMain();
+  });
+});
+
+function showMain(){
+  $('mainView').hidden = false;
+  $('welcomeMsg').textContent = 'Welcome back, ' + state.profile.full_name + '.';
+  $('loyaltyPoints').textContent = state.profile.loyalty_points || 0;
+  $('loyaltyCode').textContent = state.profile.client_code || '—';
+  loadBranches();
+  loadAppointments();
+  $('bookDate').value = todayStr();
+}
+
+/* ---------------- BOOKING ---------------- */
+function loadBranches(){
+  sb.from('branches').select('*').eq('active', true).order('name').then(function(res){
+    state.branches = res.data || [];
+    var sel = $('bookBranch');
+    sel.innerHTML = '';
+    state.branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sel.appendChild(o); });
+    loadServices();
+  });
+}
+function loadServices(){
+  sb.from('services').select('*').eq('active', true).order('category').then(function(res){
+    state.services = res.data || [];
+    var chips = $('bookServiceChips'); chips.innerHTML = '';
+    state.chosenServiceIds = [];
+    state.services.forEach(function(s){
+      var c=document.createElement('div'); c.className='chip'; c.textContent=s.name+' · ₹'+s.price;
+      c.addEventListener('click', function(){
+        c.classList.toggle('sel');
+        var idx = state.chosenServiceIds.indexOf(s.id);
+        if (idx>-1) state.chosenServiceIds.splice(idx,1); else state.chosenServiceIds.push(s.id);
+      });
+      chips.appendChild(c);
+    });
+  });
+}
+
+$('bookSaveBtn').addEventListener('click', function(){
+  var branchId = $('bookBranch').value;
+  if (!branchId) { showMsg($('bookMsg'), 'Pick a branch.', 'err'); return; }
+  if (!$('bookDate').value || !$('bookTime').value) { showMsg($('bookMsg'), 'Pick a date and time.', 'err'); return; }
+  if (!state.chosenServiceIds.length) { showMsg($('bookMsg'), 'Pick at least one service.', 'err'); return; }
+  var start = $('bookDate').value + 'T' + $('bookTime').value + ':00';
+  var total = state.services.filter(function(s){return state.chosenServiceIds.indexOf(s.id)>-1;}).reduce(function(a,s){return a+Number(s.price);},0);
+
+  // find or create this customer's client record for the chosen branch
+  sb.from('clients').select('id').eq('user_id', state.profile.id).eq('branch_id', branchId).maybeSingle().then(function(cres){
+    var proceed = function(clientId){
+      sb.from('appointments').insert({
+        branch_id: branchId, client_id: clientId, start_time: start, status: 'booked', source: 'website',
+        notes: $('bookNotes').value || null, total_amount: total
+      }).select().single().then(function(ares){
+        if (ares.error) { showMsg($('bookMsg'), ares.error.message, 'err'); return; }
+        var apptId = ares.data.id;
+        var rows = state.chosenServiceIds.map(function(sid){
+          var svc = state.services.find(function(s){return s.id===sid;});
+          return { appointment_id: apptId, service_id: sid, price: svc?svc.price:0 };
+        });
+        sb.from('appointment_services').insert(rows).then(function(){
+          showMsg($('bookMsg'), 'Request sent! The salon will confirm your slot shortly.', 'ok');
+          state.chosenServiceIds = [];
+          document.querySelectorAll('#bookServiceChips .chip').forEach(function(c){ c.classList.remove('sel'); });
+          $('bookNotes').value = '';
+          loadAppointments();
+        });
+      });
+    };
+    if (cres.data) { proceed(cres.data.id); }
+    else {
+      sb.from('clients').insert({ branch_id: branchId, full_name: state.profile.full_name, phone: state.profile.phone, user_id: state.profile.id }).select().single().then(function(newc){
+        if (newc.error) { showMsg($('bookMsg'), newc.error.message, 'err'); return; }
+        proceed(newc.data.id);
+      });
+    }
+  });
+});
+
+function loadAppointments(){
+  sb.from('clients').select('id').eq('user_id', state.profile.id).then(function(cres){
+    var clientIds = (cres.data||[]).map(function(c){return c.id;});
+    if (!clientIds.length) { $('apptEmpty').hidden = false; $('apptList').innerHTML=''; return; }
+    sb.from('appointments').select('*, branches(name), appointment_services(price, services(name))').in('client_id', clientIds).order('start_time', {ascending:false}).then(function(res){
+      var rows = res.data || [];
+      var list = $('apptList'); list.innerHTML = '';
+      if (!rows.length) { $('apptEmpty').hidden = false; return; }
+      $('apptEmpty').hidden = true;
+      rows.forEach(function(r){
+        var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
+        var div = document.createElement('div'); div.className='appt-row';
+        div.innerHTML = '<div><div>'+escapeHtml(svcNames)+'</div><div class="meta">'+fmtDateTime(r.start_time)+' · '+escapeHtml(r.branches?r.branches.name:'')+'</div></div><span class="pill pill-'+r.status+'">'+r.status.replace('_',' ')+'</span>';
+        list.appendChild(div);
+      });
+    });
+  });
+}
+</script>
+</body>
+</html>

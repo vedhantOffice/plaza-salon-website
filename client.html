@@ -24,7 +24,7 @@ a{color:var(--gold-light);}
 button{font:inherit;cursor:pointer;}
 input,select,textarea{font:inherit;}
 [hidden]{display:none !important;}
-.wrap{max-width:640px;margin:0 auto;padding:0 20px;}
+.wrap{max-width:660px;margin:0 auto;padding:0 20px;}
 header{border-bottom:1px solid var(--line);padding:20px 0;}
 header .wrap{display:flex;align-items:center;justify-content:space-between;}
 .brand{font-family:var(--serif);font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--ivory);}
@@ -32,11 +32,12 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;}
 nav.top a{color:var(--ivory-dim);text-decoration:none;font-size:.85rem;margin-left:16px;}
 main{padding:32px 0 60px;}
 h1{font-family:var(--serif);font-weight:700;font-size:1.6rem;margin:0 0 6px;}
-.sub{color:var(--ivory-dim);margin:0 0 24px;font-size:.92rem;}
+h2.h{font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;}
+.sub{color:var(--ivory-dim);margin:0 0 24px;font-size:.92rem;line-height:1.55;}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;margin-bottom:18px;}
 .field{margin:16px 0;text-align:left;}
 label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:7px;}
-input[type=email],input[type=text],input[type=tel],input[type=date],input[type=time],select,textarea{
+input[type=email],input[type=text],input[type=tel],input[type=date],input[type=time],input[type=password],select,textarea{
   width:100%;padding:11px 13px;background:var(--black);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92rem;
 }
 textarea{resize:vertical;min-height:60px;}
@@ -45,28 +46,51 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
 .btn:hover{border-color:var(--gold);color:var(--ivory);}
 .btn-solid{background:var(--gold);color:var(--black);border:none;}
 .btn-solid:hover{background:var(--gold-light);}
-.btn-solid:disabled{opacity:.5;}
+.btn-solid:disabled,.btn:disabled{opacity:.5;cursor:default;}
 .btn-block{width:100%;}
-.msg{margin-top:14px;font-size:.85rem;padding:10px 13px;border-radius:6px;display:none;text-align:left;}
+.btn-sm{padding:7px 12px;font-size:.78rem;}
+.btn-danger{border-color:var(--bad);color:var(--bad);}
+.btn-danger:hover{background:rgba(178,91,74,.12);border-color:var(--bad);color:var(--bad);}
+.msg{margin-top:14px;font-size:.85rem;padding:10px 13px;border-radius:6px;display:none;text-align:left;line-height:1.5;}
 .msg.ok{display:block;background:rgba(127,174,106,.12);color:#a8cf95;border:1px solid rgba(127,174,106,.3);}
 .msg.err{display:block;background:rgba(178,91,74,.12);color:#e0998a;border:1px solid rgba(178,91,74,.3);}
-.login-card{max-width:420px;margin:60px auto;text-align:center;}
-.login-card p{color:var(--ivory-dim);font-size:.9rem;line-height:1.6;}
+.msg.info{display:block;background:rgba(201,162,39,.1);color:var(--gold-light);border:1px solid var(--line);}
+.login-card{max-width:440px;margin:40px auto;}
+.login-card h1,.login-card .sub{text-align:center;}
+.link-btn{background:none;border:none;color:var(--gold-light);font-size:.82rem;padding:0;text-decoration:underline;}
+
+.auth-tabs{display:flex;gap:0;margin:22px 0 4px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.auth-tab{flex:1;padding:11px 8px;background:transparent;border:none;color:var(--ivory-dim);font-size:.88rem;font-weight:600;}
+.auth-tab.on{background:rgba(201,162,39,.15);color:var(--gold-light);}
+
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.tab{padding:9px 14px;border:1px solid var(--line);border-radius:100px;background:transparent;color:var(--ivory-dim);font-size:.83rem;}
+.tab.on{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold-light);font-weight:600;}
 
 .loyalty-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.loyalty-points{font-family:var(--serif);font-size:2.4rem;font-weight:700;color:var(--gold-light);}
-.loyalty-code{font-family:var(--serif);font-size:1.3rem;letter-spacing:.05em;color:var(--ivory);background:var(--black);border:1px solid var(--line);border-radius:6px;padding:8px 14px;display:inline-block;}
-.tiers{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
-.tier{flex:1;min-width:140px;background:var(--black);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--ivory-dim);}
-.tier b{color:var(--gold-light);display:block;font-size:1rem;margin-bottom:2px;}
+.loyalty-points{font-family:var(--serif);font-size:2.4rem;font-weight:700;color:var(--gold-light);line-height:1;}
+.loyalty-code{font-family:var(--serif);font-size:1.3rem;letter-spacing:.05em;color:var(--ivory);background:var(--black);border:1px solid var(--gold);border-radius:6px;padding:8px 14px;display:inline-block;}
+.cap{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:5px;}
+.tiers{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+.tier{flex:1;min-width:150px;background:var(--black);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--ivory-dim);}
+.tier b{color:var(--gold-light);display:block;font-size:.95rem;margin-bottom:3px;}
+.tier.reached{border-color:var(--good);}
+.tier .got{color:var(--good);font-size:.74rem;display:block;margin-top:5px;}
+.bar{height:6px;background:var(--black);border:1px solid var(--line);border-radius:100px;overflow:hidden;margin-top:14px;}
+.bar span{display:block;height:100%;background:var(--gold);}
 
 .chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
 .chip{padding:6px 12px;border:1px solid var(--line);border-radius:100px;font-size:.8rem;color:var(--ivory-dim);cursor:pointer;}
 .chip.sel{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold-light);}
+.svc-group{margin-top:14px;}
+.svc-group .gname{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);}
+.total-line{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);}
+.total-line .amt{font-family:var(--serif);font-size:1.5rem;color:var(--gold-light);}
 
-.appt-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:.88rem;gap:10px;}
-.appt-row:last-child{border-bottom:none;}
-.appt-row .meta{color:var(--ivory-dim);font-size:.8rem;}
+.row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);font-size:.88rem;gap:12px;}
+.row:last-child{border-bottom:none;}
+.row .meta{color:var(--ivory-dim);font-size:.8rem;margin-top:3px;line-height:1.5;}
+.row .right{text-align:right;white-space:nowrap;}
 .pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;}
 .pill-booked{background:rgba(201,162,39,.15);color:var(--gold-light);}
 .pill-confirmed{background:rgba(127,174,106,.15);color:var(--good);}
@@ -75,7 +99,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
 .pill-cancelled{background:rgba(178,91,74,.15);color:var(--bad);}
 .pill-no_show{background:rgba(178,91,74,.15);color:var(--bad);}
 .empty{padding:30px 0;text-align:center;color:var(--ivory-dim);font-size:.88rem;}
-.side-foot{margin-top:10px;font-size:.82rem;}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.resched{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--black);}
+.resched .two{display:flex;gap:10px;}
+.resched .two>div{flex:1;}
+.offer{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--black);}
+.offer:last-child{margin-bottom:0;}
+.offer b{color:var(--gold-light);}
+.offer .d{color:var(--ivory-dim);font-size:.82rem;margin-top:3px;line-height:1.5;}
+.hint{font-size:.8rem;color:var(--ivory-dim);margin-top:8px;line-height:1.5;}
+.plus{color:var(--good);} .minus{color:var(--bad);}
+@media (max-width:560px){
+  .loyalty-row{flex-direction:column;align-items:flex-start;}
+  .resched .two{flex-direction:column;}
+}
 </style>
 </head>
 <body>
@@ -93,29 +130,71 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
 <main>
   <div class="wrap">
 
-    <!-- LOGIN -->
-    <section id="loginView">
+    <!-- ============ AUTH ============ -->
+    <section id="authView" hidden>
       <div class="login-card">
         <h1>My Account</h1>
-        <p>Book appointments and check your loyalty points. Enter your email to get a secure sign-in link — no password needed.</p>
-        <form id="loginForm">
-          <div class="field">
-            <label for="loginEmail">Email</label>
-            <input type="email" id="loginEmail" required placeholder="you@example.com" autocomplete="email" />
-          </div>
-          <button type="submit" class="btn btn-solid btn-block" id="loginBtn">Send Sign-In Link</button>
+        <p class="sub">Book appointments, collect loyalty points and see your past visits.</p>
+
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab on" id="tabSignIn">Sign In</button>
+          <button type="button" class="auth-tab" id="tabSignUp">Create Account</button>
+        </div>
+
+        <form id="signInForm">
+          <div class="field"><label for="siEmail">Email</label>
+            <input type="email" id="siEmail" required autocomplete="email" placeholder="you@example.com" /></div>
+          <div class="field"><label for="siPassword">Password</label>
+            <input type="password" id="siPassword" required autocomplete="current-password" placeholder="••••••••" /></div>
+          <button type="submit" class="btn btn-solid btn-block" id="siBtn">Sign In</button>
+          <p style="text-align:center;margin:14px 0 0;">
+            <button type="button" class="link-btn" id="forgotBtn">Forgotten your password?</button>
+          </p>
         </form>
-        <div class="msg" id="loginMsg"></div>
+
+        <form id="signUpForm" hidden>
+          <div class="field"><label for="suName">Full Name</label>
+            <input type="text" id="suName" required autocomplete="name" placeholder="Your name" /></div>
+          <div class="field"><label for="suPhone">Phone Number</label>
+            <input type="tel" id="suPhone" required autocomplete="tel" placeholder="10-digit mobile number" /></div>
+          <div class="field"><label for="suEmail">Email</label>
+            <input type="email" id="suEmail" required autocomplete="email" placeholder="you@example.com" /></div>
+          <div class="field"><label for="suPassword">Password</label>
+            <input type="password" id="suPassword" required autocomplete="new-password" placeholder="At least 6 characters" /></div>
+          <div class="field"><label for="suPassword2">Confirm Password</label>
+            <input type="password" id="suPassword2" required autocomplete="new-password" placeholder="Type it again" /></div>
+          <button type="submit" class="btn btn-solid btn-block" id="suBtn">Create Account</button>
+          <p class="hint">We use your phone number to match you with your visits in the salon, so your points count from day one.</p>
+        </form>
+
+        <div class="msg" id="authMsg"></div>
+        <p style="text-align:center;margin:12px 0 0;">
+          <button type="button" class="link-btn" id="resendBtn" hidden>Resend confirmation email</button>
+        </p>
       </div>
     </section>
 
-    <!-- APP -->
+    <!-- ============ SET A NEW PASSWORD ============ -->
+    <section id="recoverView" hidden>
+      <div class="login-card">
+        <h1>Set a New Password</h1>
+        <p class="sub">Choose a new password for your account.</p>
+        <div class="field"><label for="rcPassword">New Password</label>
+          <input type="password" id="rcPassword" autocomplete="new-password" placeholder="At least 6 characters" /></div>
+        <div class="field"><label for="rcPassword2">Confirm Password</label>
+          <input type="password" id="rcPassword2" autocomplete="new-password" placeholder="Type it again" /></div>
+        <button class="btn btn-solid btn-block" id="rcBtn">Save Password</button>
+        <div class="msg" id="rcMsg"></div>
+      </div>
+    </section>
+
+    <!-- ============ APP ============ -->
     <section id="appView" hidden>
 
-      <!-- profile completion -->
+      <!-- profile top-up, only if something is missing -->
       <div class="card" id="profileCard" hidden>
         <h1>Welcome!</h1>
-        <p class="sub">Just need your name and phone to get started.</p>
+        <p class="sub">Just your name and phone number to finish setting up.</p>
         <div class="field"><label>Full Name</label><input type="text" id="profName" /></div>
         <div class="field"><label>Phone</label><input type="tel" id="profPhone" /></div>
         <div class="msg" id="profMsg"></div>
@@ -126,47 +205,99 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
         <h1>My Account</h1>
         <p class="sub" id="welcomeMsg">Welcome back.</p>
 
+        <!-- points -->
         <div class="card">
           <div class="loyalty-row">
             <div>
-              <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:4px;">Loyalty Points</div>
+              <div class="cap">Loyalty Points</div>
               <div class="loyalty-points" id="loyaltyPoints">0</div>
             </div>
             <div>
-              <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:4px;">Your ID — show this to redeem</div>
+              <div class="cap">Your ID — show this to redeem</div>
               <div class="loyalty-code" id="loyaltyCode">—</div>
             </div>
           </div>
-          <div class="tiers">
-            <div class="tier"><b>5 points</b>Ask in-store about your reward</div>
-            <div class="tier"><b>10 points</b>Ask in-store about your reward</div>
-          </div>
+          <div class="bar" id="rewardBarWrap" hidden><span id="rewardBar" style="width:0%"></span></div>
+          <div class="hint" id="rewardHint"></div>
+          <div class="tiers" id="tierList"></div>
+          <p class="hint" id="earnRate"></p>
         </div>
 
-        <div class="card">
-          <h2 style="font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;">Book an Appointment</h2>
+        <!-- offers -->
+        <div class="card" id="offersCard" hidden>
+          <h2 class="h">Running Offers</h2>
+          <div id="offerList"></div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab on" data-pane="book">Book</button>
+          <button class="tab" data-pane="appts">My Appointments</button>
+          <button class="tab" data-pane="bills">My Bills</button>
+          <button class="tab" data-pane="points">Points History</button>
+          <button class="tab" data-pane="details">My Details</button>
+        </div>
+
+        <!-- BOOK -->
+        <div class="card pane" id="pane-book">
+          <h2 class="h">Book an Appointment</h2>
           <div class="field">
             <label>Branch</label>
             <select id="bookBranch"></select>
+            <div class="hint" id="branchInfo"></div>
           </div>
           <div class="field">
             <label>Services</label>
-            <div class="chip-list" id="bookServiceChips"></div>
+            <div id="bookServiceGroups"></div>
           </div>
           <div class="field" style="display:flex;gap:12px;">
             <div style="flex:1;"><label>Date</label><input type="date" id="bookDate" required /></div>
             <div style="flex:1;"><label>Time</label><input type="time" id="bookTime" required /></div>
           </div>
-          <div class="field"><label>Notes (optional)</label><textarea id="bookNotes"></textarea></div>
+          <div class="field"><label>Notes (optional)</label><textarea id="bookNotes" placeholder="Anything we should know?"></textarea></div>
+          <div class="total-line"><span>Estimated total</span><span class="amt" id="bookTotal">₹0</span></div>
           <div class="msg" id="bookMsg"></div>
-          <button class="btn btn-solid" id="bookSaveBtn">Request Appointment</button>
-          <p class="sub" style="margin:10px 0 0;font-size:.8rem;">Your slot is confirmed once the salon accepts it — you'll see the status update below.</p>
+          <button class="btn btn-solid" id="bookSaveBtn" style="margin-top:16px;">Request Appointment</button>
+          <p class="hint">Your slot is confirmed once the salon accepts it — you'll see the status change under My Appointments.</p>
         </div>
 
-        <div class="card">
-          <h2 style="font-family:var(--serif);font-size:1.15rem;margin:0 0 14px;">My Appointments</h2>
-          <div id="apptList"></div>
-          <div class="empty" id="apptEmpty" hidden>No appointments yet — book one above.</div>
+        <!-- APPOINTMENTS -->
+        <div class="card pane" id="pane-appts" hidden>
+          <h2 class="h">Upcoming</h2>
+          <div id="apptUpcoming"></div>
+          <div class="empty" id="apptUpcomingEmpty" hidden>Nothing booked yet.</div>
+          <h2 class="h" style="margin-top:26px;">Past</h2>
+          <div id="apptPast"></div>
+          <div class="empty" id="apptPastEmpty" hidden>No past visits yet.</div>
+        </div>
+
+        <!-- BILLS -->
+        <div class="card pane" id="pane-bills" hidden>
+          <h2 class="h">My Bills</h2>
+          <div id="billList"></div>
+          <div class="empty" id="billEmpty" hidden>No bills yet — they'll appear here after your visit.</div>
+        </div>
+
+        <!-- POINTS -->
+        <div class="card pane" id="pane-points" hidden>
+          <h2 class="h">Points History</h2>
+          <div id="pointList"></div>
+          <div class="empty" id="pointEmpty" hidden>No points activity yet.</div>
+        </div>
+
+        <!-- DETAILS -->
+        <div class="card pane" id="pane-details" hidden>
+          <h2 class="h">My Details</h2>
+          <div class="field"><label>Full Name</label><input type="text" id="dtName" /></div>
+          <div class="field"><label>Phone</label><input type="tel" id="dtPhone" /></div>
+          <div class="field"><label>Email</label><input type="email" id="dtEmail" disabled /></div>
+          <div class="msg" id="dtMsg"></div>
+          <button class="btn btn-solid" id="dtSaveBtn">Save Details</button>
+
+          <h2 class="h" style="margin-top:30px;">Change Password</h2>
+          <div class="field"><label>New Password</label><input type="password" id="dtPass" autocomplete="new-password" placeholder="At least 6 characters" /></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="dtPass2" autocomplete="new-password" /></div>
+          <div class="msg" id="dtPassMsg"></div>
+          <button class="btn" id="dtPassBtn">Update Password</button>
         </div>
       </div>
     </section>
@@ -180,49 +311,159 @@ var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-var state = { profile:null, branches:[], services:[], chosenServiceIds:[] };
+var state = { profile:null, branches:[], services:[], chosenServiceIds:[], clientIds:[], settings:{}, recovering:false };
 
 function $(id){ return document.getElementById(id); }
-function showMsg(el, text, kind){ el.textContent = text; el.className = 'msg ' + kind; }
+function showMsg(el, text, kind){ el.innerHTML = text; el.className = 'msg ' + kind; }
+function clearMsg(el){ el.textContent=''; el.className='msg'; }
 function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtMoney(n){ return '₹' + Math.round(Number(n)||0).toLocaleString('en-IN'); }
 function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function digits(s){ return String(s||'').replace(/[^\d]/g,''); }
+function billNo(id){ return '#' + String(id||'').replace(/-/g,'').slice(-6).toUpperCase(); }
 
 /* ---------------- AUTH ---------------- */
-$('loginForm').addEventListener('submit', function(e){
+function showAuth(){
+  $('authView').hidden = false; $('appView').hidden = true; $('recoverView').hidden = true; $('signOutLink').hidden = true;
+}
+function showRecover(){
+  $('authView').hidden = true; $('appView').hidden = true; $('recoverView').hidden = false; $('signOutLink').hidden = true;
+}
+
+$('tabSignIn').addEventListener('click', function(){
+  $('tabSignIn').classList.add('on'); $('tabSignUp').classList.remove('on');
+  $('signInForm').hidden = false; $('signUpForm').hidden = true;
+  clearMsg($('authMsg')); $('resendBtn').hidden = true;
+});
+$('tabSignUp').addEventListener('click', function(){
+  $('tabSignUp').classList.add('on'); $('tabSignIn').classList.remove('on');
+  $('signUpForm').hidden = false; $('signInForm').hidden = true;
+  clearMsg($('authMsg')); $('resendBtn').hidden = true;
+});
+
+// --- sign in with email + password ---
+$('signInForm').addEventListener('submit', function(e){
   e.preventDefault();
-  var email = $('loginEmail').value.trim();
-  var btn = $('loginBtn');
-  btn.disabled = true; btn.textContent = 'Sending…';
-  sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: window.location.href } }).then(function(res){
-    btn.disabled = false; btn.textContent = 'Send Sign-In Link';
-    if (res.error) showMsg($('loginMsg'), res.error.message, 'err');
-    else showMsg($('loginMsg'), 'Check ' + email + ' for a sign-in link, then open it on this device.', 'ok');
+  var email = $('siEmail').value.trim(), pw = $('siPassword').value;
+  var btn = $('siBtn'); btn.disabled = true; btn.textContent = 'Signing in…';
+  clearMsg($('authMsg')); $('resendBtn').hidden = true;
+  sb.auth.signInWithPassword({ email: email, password: pw }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Sign In';
+    if (!res.error) return;
+    var m = res.error.message || 'Could not sign in.';
+    if (/confirm/i.test(m)) {
+      showMsg($('authMsg'), 'Your email is not confirmed yet. Please open the confirmation link we sent to <b>' + escapeHtml(email) + '</b>, then sign in.', 'err');
+      $('resendBtn').hidden = false;
+    } else if (/invalid login/i.test(m)) {
+      showMsg($('authMsg'), 'That email and password do not match. Please try again, or use "Forgotten your password?".', 'err');
+    } else {
+      showMsg($('authMsg'), escapeHtml(m), 'err');
+    }
   });
 });
-$('signOutLink').addEventListener('click', function(e){ e.preventDefault(); sb.auth.signOut().then(function(){ window.location.reload(); }); });
 
-sb.auth.getSession().then(function(res){ if (res.data && res.data.session) boot(); else showLogin(); });
-sb.auth.onAuthStateChange(function(event, session){ if (session) boot(); else showLogin(); });
+// --- create an account ---
+$('signUpForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = $('suName').value.trim();
+  var phone = digits($('suPhone').value);
+  var email = $('suEmail').value.trim();
+  var pw = $('suPassword').value, pw2 = $('suPassword2').value;
+  clearMsg($('authMsg')); $('resendBtn').hidden = true;
 
-function showLogin(){ $('loginView').hidden = false; $('appView').hidden = true; $('signOutLink').hidden = true; }
+  if (!name) { showMsg($('authMsg'), 'Please enter your name.', 'err'); return; }
+  if (phone.length < 10) { showMsg($('authMsg'), 'Please enter a valid 10-digit phone number.', 'err'); return; }
+  if (phone.length > 10) phone = phone.slice(-10);
+  if (pw.length < 6) { showMsg($('authMsg'), 'Password must be at least 6 characters.', 'err'); return; }
+  if (pw !== pw2) { showMsg($('authMsg'), 'Both passwords must match.', 'err'); return; }
 
-// Link any in-store client record (added by staff at the counter) that shares this phone number
-// but has no online account attached yet. This is what makes loyalty points actually start
-// counting once someone signs in -- without it, a walk-in visit and a website login are two
-// disconnected records and points never land anywhere.
+  var btn = $('suBtn'); btn.disabled = true; btn.textContent = 'Creating…';
+  sb.auth.signUp({
+    email: email, password: pw,
+    options: { data: { full_name: name, phone: phone }, emailRedirectTo: window.location.origin + window.location.pathname }
+  }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Create Account';
+    if (res.error) {
+      var m = res.error.message || 'Could not create the account.';
+      if (/already registered|already been registered/i.test(m)) {
+        showMsg($('authMsg'), 'An account already exists for that email. Please sign in instead.', 'err');
+      } else { showMsg($('authMsg'), escapeHtml(m), 'err'); }
+      return;
+    }
+    if (res.data && res.data.session) { return; } // signed straight in, onAuthStateChange takes over
+    // Confirmation is required, so move them to the sign-in tab with the message showing.
+    $('tabSignIn').click();
+    $('siEmail').value = email;
+    showMsg($('authMsg'), 'Account created. We have emailed a confirmation link to <b>' + escapeHtml(email) + '</b> — open it, then sign in here.', 'ok');
+    $('resendBtn').hidden = false;
+  });
+});
+
+$('resendBtn').addEventListener('click', function(){
+  var email = ($('siEmail').value || $('suEmail').value || '').trim();
+  if (!email) { showMsg($('authMsg'), 'Please type your email address first.', 'err'); return; }
+  var btn = this; btn.disabled = true; btn.textContent = 'Sending…';
+  sb.auth.resend({ type: 'signup', email: email, options: { emailRedirectTo: window.location.origin + window.location.pathname } }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Resend confirmation email';
+    if (res.error) showMsg($('authMsg'), escapeHtml(res.error.message), 'err');
+    else showMsg($('authMsg'), 'Sent again to <b>' + escapeHtml(email) + '</b>. Please check your inbox and spam folder.', 'ok');
+  });
+});
+
+$('forgotBtn').addEventListener('click', function(){
+  var email = $('siEmail').value.trim();
+  if (!email) { showMsg($('authMsg'), 'Type your email above first, then press this again.', 'err'); return; }
+  var btn = this; btn.disabled = true;
+  sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname }).then(function(res){
+    btn.disabled = false;
+    if (res.error) showMsg($('authMsg'), escapeHtml(res.error.message), 'err');
+    else showMsg($('authMsg'), 'We have emailed a reset link to <b>' + escapeHtml(email) + '</b>.', 'ok');
+  });
+});
+
+$('rcBtn').addEventListener('click', function(){
+  var pw = $('rcPassword').value, pw2 = $('rcPassword2').value;
+  if (pw.length < 6) { showMsg($('rcMsg'), 'Password must be at least 6 characters.', 'err'); return; }
+  if (pw !== pw2) { showMsg($('rcMsg'), 'Both passwords must match.', 'err'); return; }
+  var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+  sb.auth.updateUser({ password: pw }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Save Password';
+    if (res.error) { showMsg($('rcMsg'), escapeHtml(res.error.message), 'err'); return; }
+    state.recovering = false;
+    showMsg($('rcMsg'), 'Password updated.', 'ok');
+    setTimeout(boot, 700);
+  });
+});
+
+$('signOutLink').addEventListener('click', function(e){ e.preventDefault(); sb.auth.signOut().then(function(){ window.location.href = window.location.pathname; }); });
+
+sb.auth.onAuthStateChange(function(event, session){
+  if (event === 'PASSWORD_RECOVERY') { state.recovering = true; showRecover(); return; }
+  if (state.recovering) return;
+  if (session) boot(); else showAuth();
+});
+sb.auth.getSession().then(function(res){
+  if (state.recovering) return;
+  if (res.data && res.data.session) boot(); else showAuth();
+});
+
+/* ---------------- BOOT ---------------- */
+// Link any in-store record the salon created at the counter with this same phone number, so
+// past visits and points belong to this account instead of sitting in a disconnected row.
 function linkPhoneClients(phone){
   if (!phone) return Promise.resolve();
   return sb.from('clients').update({ user_id: state.profile.id }).eq('phone', phone).is('user_id', null).then(function(){});
 }
 
 function boot(){
-  $('loginView').hidden = true;
-  $('appView').hidden = false;
-  $('signOutLink').hidden = false;
+  $('authView').hidden = true; $('recoverView').hidden = true;
+  $('appView').hidden = false; $('signOutLink').hidden = false;
   sb.auth.getUser().then(function(res){
+    if (!res.data || !res.data.user) { showAuth(); return; }
     var uid = res.data.user.id;
-    var email = res.data.user.email;
+    state.email = res.data.user.email;
     sb.from('profiles').select('*').eq('id', uid).single().then(function(pres){
       if (pres.error || !pres.data) { setTimeout(boot, 800); return; }
       state.profile = pres.data;
@@ -231,6 +472,7 @@ function boot(){
         $('profName').value = state.profile.full_name || '';
         $('profPhone').value = state.profile.phone || '';
       } else {
+        $('profileCard').hidden = true;
         linkPhoneClients(state.profile.phone).then(showMain);
       }
     });
@@ -238,125 +480,403 @@ function boot(){
 }
 
 $('profSaveBtn').addEventListener('click', function(){
-  var name = $('profName').value.trim(), phone = $('profPhone').value.trim();
-  if (!name || !phone) { showMsg($('profMsg'), 'Please enter your name and phone.', 'err'); return; }
+  var name = $('profName').value.trim(), phone = digits($('profPhone').value);
+  if (!name || phone.length < 10) { showMsg($('profMsg'), 'Please enter your name and a valid 10-digit phone number.', 'err'); return; }
+  if (phone.length > 10) phone = phone.slice(-10);
   sb.from('profiles').update({ full_name: name, phone: phone }).eq('id', state.profile.id).then(function(res){
     if (res.error) { showMsg($('profMsg'), res.error.message, 'err'); return; }
     state.profile.full_name = name; state.profile.phone = phone;
-    linkPhoneClients(phone).then(function(){
-      $('profileCard').hidden = true;
-      showMain();
-    });
+    linkPhoneClients(phone).then(function(){ $('profileCard').hidden = true; showMain(); });
   });
 });
 
 function showMain(){
   $('mainView').hidden = false;
-  var welcome = 'Welcome back, ' + state.profile.full_name + '.';
+  var welcome = 'Welcome back, ' + escapeHtml(state.profile.full_name) + '.';
   if (state.profile.role !== 'customer') {
-    welcome += ' You\'re viewing this as staff — this is exactly what your customers see. Use <a href="app.html" style="color:var(--gold-light);">Plaza OS</a> for the staff dashboard.';
+    welcome += ' You\'re viewing this as staff — this is exactly what your customers see. Use <a href="app.html">Plaza OS</a> for the staff dashboard.';
   }
   $('welcomeMsg').innerHTML = welcome;
   $('loyaltyPoints').textContent = state.profile.loyalty_points || 0;
   $('loyaltyCode').textContent = state.profile.client_code || '—';
-  loadBranches();
-  loadAppointments();
+  $('dtName').value = state.profile.full_name || '';
+  $('dtPhone').value = state.profile.phone || '';
+  $('dtEmail').value = state.email || '';
+  $('bookDate').min = todayStr();
   $('bookDate').value = todayStr();
+  loadSettings();
+  loadOffers();
+  loadBranches();
+  loadMyClientIds();
+}
+
+/* ---------------- TABS ---------------- */
+document.querySelectorAll('.tab').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    document.querySelectorAll('.pane').forEach(function(p){ p.hidden = true; });
+    $('pane-' + btn.dataset.pane).hidden = false;
+    if (btn.dataset.pane === 'bills') loadBills();
+    if (btn.dataset.pane === 'points') loadPoints();
+  });
+});
+
+/* ---------------- SETTINGS, REWARDS, OFFERS ---------------- */
+function loadSettings(){
+  sb.from('app_settings').select('*').then(function(res){
+    (res.data||[]).forEach(function(r){ state.settings[r.key] = r.value; });
+    var rate = state.settings.loyalty_points_per_rupee || { per_rupees:100, points:1 };
+    $('earnRate').textContent = 'You earn ' + rate.points + ' point for every ' + fmtMoney(rate.per_rupees) + ' you spend with us.';
+    renderRewards();
+  });
+}
+
+function renderRewards(){
+  var tiers = state.settings.loyalty_rewards || [];
+  var have = Number(state.profile.loyalty_points || 0);
+  var list = $('tierList'); list.innerHTML = '';
+  if (!tiers.length) { $('rewardHint').textContent = ''; return; }
+  tiers.forEach(function(t){
+    var reached = have >= Number(t.points);
+    var d = document.createElement('div');
+    d.className = 'tier' + (reached ? ' reached' : '');
+    d.innerHTML = '<b>' + Number(t.points) + ' points</b>' + escapeHtml(t.reward || '') +
+      (reached ? '<span class="got">You can claim this now</span>' : '');
+    list.appendChild(d);
+  });
+  var next = null;
+  tiers.forEach(function(t){ if (have < Number(t.points) && (!next || Number(t.points) < Number(next.points))) next = t; });
+  if (next) {
+    var need = Number(next.points) - have;
+    $('rewardHint').textContent = need + (need === 1 ? ' more point' : ' more points') + ' until ' + (next.reward || 'your next reward') + '.';
+    $('rewardBarWrap').hidden = false;
+    $('rewardBar').style.width = Math.max(3, Math.round(have / Number(next.points) * 100)) + '%';
+  } else {
+    $('rewardHint').textContent = 'You have enough points for every reward — show your ID at the counter to claim.';
+    $('rewardBarWrap').hidden = false;
+    $('rewardBar').style.width = '100%';
+  }
+}
+
+function loadOffers(){
+  var today = todayStr();
+  sb.from('offers').select('*').eq('active', true).then(function(res){
+    var rows = (res.data||[]).filter(function(o){
+      return (!o.valid_from || o.valid_from <= today) && (!o.valid_to || o.valid_to >= today);
+    });
+    if (!rows.length) { $('offersCard').hidden = true; return; }
+    $('offersCard').hidden = false;
+    var box = $('offerList'); box.innerHTML = '';
+    rows.forEach(function(o){
+      var disc = o.discount_type === 'percent' ? (o.discount_value + '% off') : (fmtMoney(o.discount_value) + ' off');
+      var d = document.createElement('div'); d.className = 'offer';
+      d.innerHTML = '<b>' + escapeHtml(o.title) + ' — ' + disc + '</b>' +
+        (o.description ? '<div class="d">' + escapeHtml(o.description) + '</div>' : '') +
+        (o.valid_to ? '<div class="d">Valid until ' + fmtDate(o.valid_to) + '</div>' : '');
+      box.appendChild(d);
+    });
+  });
 }
 
 /* ---------------- BOOKING ---------------- */
 function loadBranches(){
   sb.from('branches').select('*').eq('active', true).order('name').then(function(res){
     state.branches = res.data || [];
-    var sel = $('bookBranch');
-    sel.innerHTML = '';
+    var sel = $('bookBranch'); sel.innerHTML = '';
     state.branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sel.appendChild(o); });
+    sel.addEventListener('change', applyBranch);
+    applyBranch();
     loadServices();
   });
 }
+
+function currentBranch(){
+  var id = $('bookBranch').value;
+  return state.branches.find(function(b){ return b.id === id; }) || null;
+}
+
+function applyBranch(){
+  var b = currentBranch();
+  if (!b) { $('branchInfo').textContent = ''; return; }
+  var bits = [];
+  if (b.address) bits.push(escapeHtml(b.address));
+  if (b.phone) bits.push('Ph: ' + escapeHtml(b.phone));
+  if (b.opening_time && b.closing_time) bits.push('Open ' + escapeHtml(b.opening_time) + ' – ' + escapeHtml(b.closing_time));
+  $('branchInfo').innerHTML = bits.join(' · ');
+  var t = $('bookTime');
+  if (b.opening_time && b.closing_time) { t.min = b.opening_time; t.max = b.closing_time; }
+  else { t.removeAttribute('min'); t.removeAttribute('max'); }
+}
+
 function loadServices(){
   sb.from('services').select('*').eq('active', true).order('category').then(function(res){
     state.services = res.data || [];
-    var chips = $('bookServiceChips'); chips.innerHTML = '';
     state.chosenServiceIds = [];
+    var box = $('bookServiceGroups'); box.innerHTML = '';
+    var groups = {};
     state.services.forEach(function(s){
-      var c=document.createElement('div'); c.className='chip'; c.textContent=s.name+' · ₹'+s.price;
-      c.addEventListener('click', function(){
-        c.classList.toggle('sel');
-        var idx = state.chosenServiceIds.indexOf(s.id);
-        if (idx>-1) state.chosenServiceIds.splice(idx,1); else state.chosenServiceIds.push(s.id);
-      });
-      chips.appendChild(c);
+      var g = s.category || 'Other';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(s);
     });
+    Object.keys(groups).forEach(function(g){
+      var wrap = document.createElement('div'); wrap.className = 'svc-group';
+      var gn = document.createElement('div'); gn.className = 'gname'; gn.textContent = g;
+      var chips = document.createElement('div'); chips.className = 'chip-list';
+      groups[g].forEach(function(s){
+        var c = document.createElement('div'); c.className = 'chip';
+        c.textContent = s.name + ' · ' + fmtMoney(s.price) + (s.duration_minutes ? ' · ' + s.duration_minutes + ' min' : '');
+        c.addEventListener('click', function(){
+          c.classList.toggle('sel');
+          var i = state.chosenServiceIds.indexOf(s.id);
+          if (i > -1) state.chosenServiceIds.splice(i,1); else state.chosenServiceIds.push(s.id);
+          updateBookTotal();
+        });
+        chips.appendChild(c);
+      });
+      wrap.appendChild(gn); wrap.appendChild(chips); box.appendChild(wrap);
+    });
+    updateBookTotal();
   });
 }
+
+function chosenTotal(){
+  return state.services.filter(function(s){ return state.chosenServiceIds.indexOf(s.id) > -1; })
+    .reduce(function(a,s){ return a + Number(s.price); }, 0);
+}
+function updateBookTotal(){ $('bookTotal').textContent = fmtMoney(chosenTotal()); }
 
 $('bookSaveBtn').addEventListener('click', function(){
   var branchId = $('bookBranch').value;
-  if (!branchId) { showMsg($('bookMsg'), 'Pick a branch.', 'err'); return; }
-  if (!$('bookDate').value || !$('bookTime').value) { showMsg($('bookMsg'), 'Pick a date and time.', 'err'); return; }
-  if (!state.chosenServiceIds.length) { showMsg($('bookMsg'), 'Pick at least one service.', 'err'); return; }
-  var start = $('bookDate').value + 'T' + $('bookTime').value + ':00';
-  var total = state.services.filter(function(s){return state.chosenServiceIds.indexOf(s.id)>-1;}).reduce(function(a,s){return a+Number(s.price);},0);
+  var date = $('bookDate').value, time = $('bookTime').value;
+  clearMsg($('bookMsg'));
+  if (!branchId) { showMsg($('bookMsg'), 'Please pick a branch.', 'err'); return; }
+  if (!date || !time) { showMsg($('bookMsg'), 'Please pick a date and time.', 'err'); return; }
+  if (!state.chosenServiceIds.length) { showMsg($('bookMsg'), 'Please pick at least one service.', 'err'); return; }
 
-  // find or create this customer's client record for the chosen branch
-  sb.from('clients').select('id').eq('user_id', state.profile.id).eq('branch_id', branchId).maybeSingle().then(function(cres){
-    var proceed = function(clientId){
-      sb.from('appointments').insert({
-        branch_id: branchId, client_id: clientId, start_time: start, status: 'booked', source: 'website',
-        notes: $('bookNotes').value || null, total_amount: total
-      }).select().single().then(function(ares){
-        if (ares.error) { showMsg($('bookMsg'), ares.error.message, 'err'); return; }
-        var apptId = ares.data.id;
-        var rows = state.chosenServiceIds.map(function(sid){
-          var svc = state.services.find(function(s){return s.id===sid;});
-          return { appointment_id: apptId, service_id: sid, price: svc?svc.price:0 };
-        });
-        sb.from('appointment_services').insert(rows).then(function(){
-          showMsg($('bookMsg'), 'Request sent! The salon will confirm your slot shortly.', 'ok');
-          state.chosenServiceIds = [];
-          document.querySelectorAll('#bookServiceChips .chip').forEach(function(c){ c.classList.remove('sel'); });
-          $('bookNotes').value = '';
-          loadAppointments();
-        });
+  var start = date + 'T' + time + ':00';
+  if (new Date(start).getTime() < Date.now()) { showMsg($('bookMsg'), 'That time has already passed — please pick a later slot.', 'err'); return; }
+  var b = currentBranch();
+  if (b && b.opening_time && b.closing_time && (time < b.opening_time || time > b.closing_time)) {
+    showMsg($('bookMsg'), 'We are open ' + escapeHtml(b.opening_time) + ' to ' + escapeHtml(b.closing_time) + '. Please pick a time in between.', 'err');
+    return;
+  }
+
+  var total = chosenTotal();
+  var btn = this; btn.disabled = true; btn.textContent = 'Sending…';
+  var done = function(ok, msg){ btn.disabled = false; btn.textContent = 'Request Appointment'; showMsg($('bookMsg'), msg, ok ? 'ok' : 'err'); };
+
+  ensureClientForBranch(branchId).then(function(clientId){
+    sb.from('appointments').insert({
+      branch_id: branchId, client_id: clientId, start_time: start, status: 'booked', source: 'website',
+      notes: $('bookNotes').value || null, total_amount: total
+    }).select().single().then(function(ares){
+      if (ares.error) { done(false, escapeHtml(ares.error.message)); return; }
+      var rows = state.chosenServiceIds.map(function(sid){
+        var svc = state.services.find(function(s){ return s.id === sid; });
+        return { appointment_id: ares.data.id, service_id: sid, price: svc ? svc.price : 0 };
       });
-    };
-    if (cres.data) { proceed(cres.data.id); }
-    else {
-      // No linked record for this branch yet -- check for an in-store record with the same phone
-      // (added by staff, not yet linked) before creating a brand new one, so history stays together.
-      sb.from('clients').select('id').eq('phone', state.profile.phone).eq('branch_id', branchId).is('user_id', null).maybeSingle().then(function(existing){
-        if (existing.data) {
-          sb.from('clients').update({ user_id: state.profile.id }).eq('id', existing.data.id).then(function(){ proceed(existing.data.id); });
-          return;
-        }
-        sb.from('clients').insert({ branch_id: branchId, full_name: state.profile.full_name, phone: state.profile.phone, user_id: state.profile.id }).select().single().then(function(newc){
-          if (newc.error) { showMsg($('bookMsg'), newc.error.message, 'err'); return; }
-          proceed(newc.data.id);
-        });
+      sb.from('appointment_services').insert(rows).then(function(){
+        done(true, 'Request sent. The salon will confirm your slot shortly.');
+        state.chosenServiceIds = [];
+        document.querySelectorAll('#bookServiceGroups .chip').forEach(function(c){ c.classList.remove('sel'); });
+        $('bookNotes').value = ''; $('bookTime').value = '';
+        updateBookTotal();
+        loadMyClientIds();
       });
-    }
-  });
+    });
+  }).catch(function(err){ done(false, escapeHtml(String(err && err.message || err))); });
 });
 
-function loadAppointments(){
-  sb.from('clients').select('id').eq('user_id', state.profile.id).then(function(cres){
-    var clientIds = (cres.data||[]).map(function(c){return c.id;});
-    if (!clientIds.length) { $('apptEmpty').hidden = false; $('apptList').innerHTML=''; return; }
-    sb.from('appointments').select('*, branches(name), appointment_services(price, services(name))').in('client_id', clientIds).order('start_time', {ascending:false}).then(function(res){
-      var rows = res.data || [];
-      var list = $('apptList'); list.innerHTML = '';
-      if (!rows.length) { $('apptEmpty').hidden = false; return; }
-      $('apptEmpty').hidden = true;
-      rows.forEach(function(r){
-        var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
-        var div = document.createElement('div'); div.className='appt-row';
-        div.innerHTML = '<div><div>'+escapeHtml(svcNames)+'</div><div class="meta">'+fmtDateTime(r.start_time)+' · '+escapeHtml(r.branches?r.branches.name:'')+'</div></div><span class="pill pill-'+r.status+'">'+r.status.replace('_',' ')+'</span>';
-        list.appendChild(div);
+// Reuse the salon's own record for this customer where one exists, so history stays in one place.
+function ensureClientForBranch(branchId){
+  return sb.from('clients').select('id').eq('user_id', state.profile.id).eq('branch_id', branchId).maybeSingle().then(function(cres){
+    if (cres.data) return cres.data.id;
+    return sb.from('clients').select('id').eq('phone', state.profile.phone).eq('branch_id', branchId).is('user_id', null).maybeSingle().then(function(ex){
+      if (ex.data) {
+        return sb.from('clients').update({ user_id: state.profile.id }).eq('id', ex.data.id).then(function(){ return ex.data.id; });
+      }
+      return sb.from('clients').insert({
+        branch_id: branchId, full_name: state.profile.full_name, phone: state.profile.phone, user_id: state.profile.id
+      }).select().single().then(function(nc){
+        if (nc.error) throw nc.error;
+        return nc.data.id;
       });
     });
   });
 }
+
+/* ---------------- MY APPOINTMENTS ---------------- */
+function loadMyClientIds(){
+  sb.from('clients').select('id').eq('user_id', state.profile.id).then(function(res){
+    state.clientIds = (res.data||[]).map(function(c){ return c.id; });
+    loadAppointments();
+  });
+}
+
+function loadAppointments(){
+  var up = $('apptUpcoming'), past = $('apptPast');
+  up.innerHTML = ''; past.innerHTML = '';
+  if (!state.clientIds.length) { $('apptUpcomingEmpty').hidden = false; $('apptPastEmpty').hidden = false; return; }
+  sb.from('appointments').select('*, branches(name), appointment_services(price, services(name))')
+    .in('client_id', state.clientIds).order('start_time', { ascending: false }).then(function(res){
+    var rows = res.data || [];
+    var now = Date.now();
+    var upRows = [], pastRows = [];
+    rows.forEach(function(r){
+      var over = new Date(r.start_time).getTime() < now;
+      var closed = ['completed','cancelled','no_show'].indexOf(r.status) > -1;
+      if (over || closed) pastRows.push(r); else upRows.push(r);
+    });
+    upRows.sort(function(a,b){ return new Date(a.start_time) - new Date(b.start_time); });
+    $('apptUpcomingEmpty').hidden = upRows.length > 0;
+    $('apptPastEmpty').hidden = pastRows.length > 0;
+    upRows.forEach(function(r){ up.appendChild(apptRow(r, true)); });
+    pastRows.forEach(function(r){ past.appendChild(apptRow(r, false)); });
+  });
+}
+
+function apptRow(r, canChange){
+  var svcNames = (r.appointment_services||[]).map(function(s){ return s.services ? s.services.name : ''; }).filter(Boolean).join(', ') || '—';
+  var div = document.createElement('div'); div.className = 'row';
+  var left = document.createElement('div');
+  left.innerHTML = '<div>' + escapeHtml(svcNames) + '</div>' +
+    '<div class="meta">' + fmtDateTime(r.start_time) + '<br>' + escapeHtml(r.branches ? r.branches.name : '') +
+    (r.total_amount ? ' · about ' + fmtMoney(r.total_amount) : '') + '</div>';
+  var right = document.createElement('div'); right.className = 'right';
+  right.innerHTML = '<span class="pill pill-' + r.status + '">' + r.status.replace('_',' ') + '</span>';
+
+  if (canChange && (r.status === 'booked' || r.status === 'confirmed')) {
+    var acts = document.createElement('div'); acts.className = 'actions';
+    var reBtn = document.createElement('button'); reBtn.className = 'btn btn-sm'; reBtn.textContent = 'Reschedule';
+    var caBtn = document.createElement('button'); caBtn.className = 'btn btn-sm btn-danger'; caBtn.textContent = 'Cancel';
+    var box = document.createElement('div'); box.className = 'resched'; box.hidden = true;
+    var d = new Date(r.start_time);
+    var dv = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var tv = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    box.innerHTML = '<div class="two"><div><label>New date</label><input type="date" class="rd" min="' + todayStr() + '" value="' + dv + '"></div>' +
+                    '<div><label>New time</label><input type="time" class="rt" value="' + tv + '"></div></div>' +
+                    '<div class="msg rmsg"></div>';
+    var saveBtn = document.createElement('button'); saveBtn.className = 'btn btn-solid btn-sm'; saveBtn.textContent = 'Save new time';
+    saveBtn.style.marginTop = '10px';
+    box.appendChild(saveBtn);
+    // Hold references: showMsg rewrites className, so re-querying by class would fail second time.
+    var dEl = box.querySelector('.rd'), tEl = box.querySelector('.rt'), m = box.querySelector('.rmsg');
+
+    reBtn.addEventListener('click', function(){ box.hidden = !box.hidden; });
+    saveBtn.addEventListener('click', function(){
+      var nd = dEl.value, nt = tEl.value;
+      if (!nd || !nt) { showMsg(m, 'Pick a date and time.', 'err'); return; }
+      var iso = nd + 'T' + nt + ':00';
+      if (new Date(iso).getTime() < Date.now()) { showMsg(m, 'That time has already passed.', 'err'); return; }
+      saveBtn.disabled = true;
+      sb.from('appointments').update({ start_time: iso, status: 'booked' }).eq('id', r.id).then(function(res){
+        saveBtn.disabled = false;
+        if (res.error) { showMsg(m, escapeHtml(res.error.message), 'err'); return; }
+        loadAppointments();
+      });
+    });
+    caBtn.addEventListener('click', function(){
+      if (!confirm('Cancel this appointment?')) return;
+      caBtn.disabled = true;
+      sb.from('appointments').update({ status: 'cancelled' }).eq('id', r.id).then(function(res){
+        caBtn.disabled = false;
+        if (res.error) { alert('Could not cancel: ' + res.error.message); return; }
+        loadAppointments();
+      });
+    });
+    acts.appendChild(reBtn); acts.appendChild(caBtn);
+    left.appendChild(acts); left.appendChild(box);
+  }
+
+  div.appendChild(left); div.appendChild(right);
+  return div;
+}
+
+/* ---------------- MY BILLS ---------------- */
+function loadBills(){
+  var box = $('billList'); box.innerHTML = '';
+  if (!state.clientIds.length) { $('billEmpty').hidden = false; return; }
+  sb.from('invoices').select('*, invoice_items(description, qty, price)')
+    .in('client_id', state.clientIds).order('created_at', { ascending: false }).then(function(res){
+    var rows = res.data || [];
+    $('billEmpty').hidden = rows.length > 0;
+    rows.forEach(function(r){
+      var items = (r.invoice_items||[]).map(function(i){
+        return escapeHtml(i.description) + ' × ' + (Number(i.qty)||1) + ' — ' + fmtMoney(Number(i.qty||1) * Number(i.price||0));
+      }).join('<br>') || '—';
+      var div = document.createElement('div'); div.className = 'row';
+      div.innerHTML = '<div><div>Bill ' + billNo(r.id) + '</div><div class="meta">' + fmtDateTime(r.created_at) + '<br>' + items + '</div></div>' +
+        '<div class="right"><div style="font-family:var(--serif);font-size:1.15rem;color:var(--gold-light);">' + fmtMoney(r.total) + '</div>' +
+        '<div class="meta">' + escapeHtml(r.payment_method || '') + (r.loyalty_points_awarded ? '<br><span class="plus">+' + r.loyalty_points_awarded + ' points</span>' : '') + '</div></div>';
+      box.appendChild(div);
+    });
+  });
+}
+
+/* ---------------- POINTS HISTORY ---------------- */
+function loadPoints(){
+  var box = $('pointList'); box.innerHTML = '';
+  var earned = state.clientIds.length
+    ? sb.from('invoices').select('id, created_at, total, loyalty_points_awarded').in('client_id', state.clientIds)
+    : Promise.resolve({ data: [] });
+  var spent = sb.from('loyalty_redemptions').select('*').eq('profile_id', state.profile.id);
+  Promise.all([earned, spent]).then(function(r){
+    var items = [];
+    (r[0].data||[]).forEach(function(i){
+      if (!i.loyalty_points_awarded) return;
+      items.push({ when: i.created_at, pts: i.loyalty_points_awarded, label: 'Earned on bill ' + billNo(i.id), sub: fmtMoney(i.total) });
+    });
+    (r[1].data||[]).forEach(function(x){
+      items.push({ when: x.created_at, pts: -Number(x.points_redeemed), label: 'Redeemed', sub: x.reward_description || '' });
+    });
+    items.sort(function(a,b){ return new Date(b.when) - new Date(a.when); });
+    $('pointEmpty').hidden = items.length > 0;
+    items.forEach(function(it){
+      var div = document.createElement('div'); div.className = 'row';
+      div.innerHTML = '<div><div>' + escapeHtml(it.label) + '</div><div class="meta">' + fmtDateTime(it.when) +
+        (it.sub ? ' · ' + escapeHtml(it.sub) : '') + '</div></div>' +
+        '<div class="right"><span class="' + (it.pts > 0 ? 'plus' : 'minus') + '" style="font-size:1.05rem;font-weight:600;">' +
+        (it.pts > 0 ? '+' : '') + it.pts + '</span></div>';
+      box.appendChild(div);
+    });
+  });
+}
+
+/* ---------------- MY DETAILS ---------------- */
+$('dtSaveBtn').addEventListener('click', function(){
+  var name = $('dtName').value.trim(), phone = digits($('dtPhone').value);
+  clearMsg($('dtMsg'));
+  if (!name || phone.length < 10) { showMsg($('dtMsg'), 'Please enter your name and a valid 10-digit phone number.', 'err'); return; }
+  if (phone.length > 10) phone = phone.slice(-10);
+  var btn = this; btn.disabled = true;
+  sb.from('profiles').update({ full_name: name, phone: phone }).eq('id', state.profile.id).then(function(res){
+    if (res.error) { btn.disabled = false; showMsg($('dtMsg'), escapeHtml(res.error.message), 'err'); return; }
+    state.profile.full_name = name; state.profile.phone = phone;
+    // keep the salon's own copy of the name and number in step
+    sb.from('clients').update({ full_name: name, phone: phone }).eq('user_id', state.profile.id).then(function(){
+      btn.disabled = false;
+      showMsg($('dtMsg'), 'Saved.', 'ok');
+      $('welcomeMsg').innerHTML = 'Welcome back, ' + escapeHtml(name) + '.';
+      linkPhoneClients(phone).then(loadMyClientIds);
+    });
+  });
+});
+
+$('dtPassBtn').addEventListener('click', function(){
+  var p1 = $('dtPass').value, p2 = $('dtPass2').value;
+  clearMsg($('dtPassMsg'));
+  if (p1.length < 6) { showMsg($('dtPassMsg'), 'Password must be at least 6 characters.', 'err'); return; }
+  if (p1 !== p2) { showMsg($('dtPassMsg'), 'Both passwords must match.', 'err'); return; }
+  var btn = this; btn.disabled = true;
+  sb.auth.updateUser({ password: p1 }).then(function(res){
+    btn.disabled = false;
+    if (res.error) { showMsg($('dtPassMsg'), escapeHtml(res.error.message), 'err'); return; }
+    $('dtPass').value = ''; $('dtPass2').value = '';
+    showMsg($('dtPassMsg'), 'Password updated.', 'ok');
+  });
+});
 </script>
 </body>
 </html>

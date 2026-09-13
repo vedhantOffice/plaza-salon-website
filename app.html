@@ -277,6 +277,1961 @@ select.status{background:var(--black);color:var(--ivory);border:1px solid var(--
         <button class="btn btn-solid" id="newInvoiceBtn">+ New Bill</button>
       </div>
       <div class="table-wrap"><table id="invoiceTable">
+        <thead><tr><th>Date</th><th>Client</th><th>Items</th><th>Payment</th><th>Total</th><th>Points</th><th>Receipt</th></tr></thead>
+        <tbody id="invoiceBody"></tbody>
+      </table><div class="empty" id="invoiceEmpty" hidden>No bills yet.</div></div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section class="view" id="view-clients">
+      <h1>Clients</h1>
+      <p class="sub">Client profiles, history & loyalty.</p>
+      <div class="toolbar">
+        <input type="text" class="search" id="clientSearch" placeholder="Search name or phone…" />
+        <button class="btn btn-solid" id="newClientBtn">+ Add Client</button>
+      </div>
+      <div class="table-wrap"><table id="clientTable">
+        <thead><tr><th>Name</th><th>Phone</th><th>Tags</th><th>Loyalty Pts</th><th>Added</th></tr></thead>
+        <tbody id="clientBody"></tbody>
+      </table><div class="empty" id="clientEmpty" hidden>No clients yet — add your first one.</div></div>
+    </section>
+
+    <!-- WEBSITE ENQUIRIES (legacy bookings inbox) -->
+    <section class="view" id="view-inbox">
+      <h1>Website Enquiries</h1>
+      <p class="sub">Everything submitted through the Book Now form on the salon & academy sites.</p>
+      <div class="table-wrap"><table id="inboxTable">
+        <thead><tr><th>Received</th><th>Name</th><th>Phone</th><th>Source</th><th>Need</th><th>Preferred</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="inboxBody"></tbody>
+      </table><div class="empty" id="inboxEmpty" hidden>No enquiries yet.</div></div>
+    </section>
+
+    <!-- LOYALTY POINTS -->
+    <section class="view" id="view-loyalty">
+      <h1>Loyalty Points</h1>
+      <p class="sub">Look up a customer by their ID and redeem points when they visit. Points are earned automatically at ₹<span id="loyRateRupees">100</span> spent = <span id="loyRatePoints">1</span> pt.</p>
+      <div class="grid2">
+        <div class="card">
+          <div class="field">
+            <label>Customer ID (they show this from their account)</label>
+            <div style="display:flex;gap:10px;">
+              <input type="text" id="loyaltyCodeInput" placeholder="e.g. PZ00001" style="text-transform:uppercase;" />
+              <button class="btn btn-solid" id="loyaltyLookupBtn" style="white-space:nowrap;">Look Up</button>
+            </div>
+          </div>
+          <div class="msg" id="loyaltyLookupMsg"></div>
+          <div id="loyaltyCustomerCard" hidden style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+              <div>
+                <div id="loyaltyCustName" style="font-family:var(--serif);font-size:1.2rem;"></div>
+                <div id="loyaltyCustPhone" class="muted" style="font-size:.85rem;"></div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);">Balance</div>
+                <div id="loyaltyCustBalance" style="font-family:var(--serif);font-size:1.8rem;color:var(--gold-light);">0</div>
+              </div>
+            </div>
+            <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div class="field"><label>Points to Redeem</label>
+                <select id="redeemPoints"><option value="5">5</option><option value="10">10</option></select>
+              </div>
+              <div class="field"><label>Reward Given (optional note)</label><input type="text" id="redeemReward" placeholder="e.g. Free threading" /></div>
+            </div>
+            <div class="msg" id="redeemMsg"></div>
+            <button class="btn btn-solid" id="redeemBtn">Redeem Points</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="h">Top Loyal Customers</h2>
+          <div class="table-wrap"><table id="loyalTable">
+            <thead><tr><th>Name</th><th>Phone</th><th>Points</th></tr></thead>
+            <tbody id="loyalBody"></tbody>
+          </table><div class="empty" id="loyalEmpty" hidden>No loyalty customers yet.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES & OFFERS -->
+    <section class="view" id="view-services">
+      <h1>Services & Offers</h1>
+      <p class="sub">Manage the service menu, pricing and running offers.</p>
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:14px;">
+          <h2 class="h" style="margin:0;">Services</h2>
+          <button class="btn btn-solid" id="newServiceBtn">+ Add Service</button>
+        </div>
+        <div class="table-wrap"><table id="serviceTable">
+          <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Duration</th><th>Active</th><th></th></tr></thead>
+          <tbody id="serviceBody"></tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:14px;">
+          <h2 class="h" style="margin:0;">Offers</h2>
+          <button class="btn btn-solid" id="newOfferBtn">+ Add Offer</button>
+        </div>
+        <div class="table-wrap"><table id="offerTable">
+          <thead><tr><th>Title</th><th>Discount</th><th>Valid</th><th>Active</th><th></th></tr></thead>
+          <tbody id="offerBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- STAFF & BRANCHES (owner/manager) -->
+    <section class="view" id="view-staff">
+      <h1>Staff & Branches</h1>
+      <p class="sub">Manage branches, franchises, and who has access.</p>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:14px;">
+          <h2 class="h" style="margin:0;">Branches</h2>
+          <button class="btn btn-solid" id="newBranchBtn">+ Add Branch / Franchise</button>
+        </div>
+        <div class="table-wrap"><table id="branchTable">
+          <thead><tr><th>Name</th><th>Code</th><th>Type</th><th>Active</th></tr></thead>
+          <tbody id="branchBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar" style="margin-bottom:14px;">
+          <h2 class="h" style="margin:0;">Team</h2>
+          <button class="btn btn-solid" id="newStaffBtn">+ Add Staff</button>
+        </div>
+        <p class="sub" style="margin-bottom:14px;">Every staff member gets a unique Staff ID + password issued here, used to log in and mark attendance.</p>
+        <div class="table-wrap"><table id="teamTable">
+          <thead><tr><th>Staff ID</th><th>Name</th><th>Role</th><th>Branch</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="teamBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card">
+        <h2 class="h">All Accounts</h2>
+        <p class="sub" style="margin-bottom:14px;">Every account that has ever signed in — including customers. Use this only to fix a mis-set role/branch.</p>
+        <div class="table-wrap"><table id="peopleTable">
+          <thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Active</th></tr></thead>
+          <tbody id="peopleBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- HIRING -->
+    <section class="view" id="view-hiring">
+      <h1>Hiring</h1>
+      <p class="sub">Candidates, document checklist, and converting a hire into a staff account.</p>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn btn-solid" id="newCandidateBtn">+ Add Candidate</button>
+      </div>
+      <div class="table-wrap"><table id="candidateTable">
+        <thead><tr><th>Name</th><th>Role Applied</th><th>Phone</th><th>Docs</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="candidateBody"></tbody>
+      </table><div class="empty" id="candidateEmpty" hidden>No candidates yet.</div></div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="view" id="view-reports">
+      <h1>Reports</h1>
+      <p class="sub">Revenue, popular services, staff performance & inventory.</p>
+      <div class="toolbar">
+        <div class="left">
+          <input type="date" id="repFrom" />
+          <span class="muted">to</span>
+          <input type="date" id="repTo" />
+          <button class="btn btn-solid" id="repRunBtn">Run</button>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="repRevenue">₹0</div><div class="l">Revenue</div></div>
+        <div class="stat"><div class="n" id="repInvoices">0</div><div class="l">Bills</div></div>
+        <div class="stat"><div class="n" id="repCash">₹0</div><div class="l">Cash</div></div>
+        <div class="stat"><div class="n" id="repCard">₹0</div><div class="l">Card</div></div>
+        <div class="stat"><div class="n" id="repUpi">₹0</div><div class="l">UPI</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h2 class="h">Popular Services</h2>
+          <div class="table-wrap"><table id="popServiceTable">
+            <thead><tr><th>Service</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+            <tbody id="popServiceBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <h2 class="h">Staff Performance</h2>
+          <div class="table-wrap"><table id="staffPerfTable">
+            <thead><tr><th>Staff</th><th>Bills</th><th>Revenue</th></tr></thead>
+            <tbody id="staffPerfBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="h">Inventory Alerts</h2>
+        <div class="table-wrap"><table id="invAlertTable">
+          <thead><tr><th>Item</th><th>Type</th><th>Detail</th></tr></thead>
+          <tbody id="invAlertBody"></tbody>
+        </table><div class="empty" id="invAlertEmpty" hidden>Nothing needs attention.</div></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <h1>Settings</h1>
+      <p class="sub">Franchise-wide configuration.</p>
+      <div class="card">
+        <h2 class="h">Loyalty Program</h2>
+        <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="field"><label>₹ Spent</label><input type="number" id="setLoyaltyRupees" /></div>
+          <div class="field"><label>Points Earned</label><input type="number" id="setLoyaltyPoints" /></div>
+        </div>
+        <div class="msg" id="settingsLoyMsg"></div>
+        <button class="btn btn-solid" id="saveLoyaltyBtn">Save</button>
+      </div>
+      <div class="card">
+        <h2 class="h">Salon Info</h2>
+        <div class="field"><label>Salon Name</label><input type="text" id="setSalonName" /></div>
+        <div class="field"><label>GST Rate (%)</label><input type="number" id="setGstRate" /></div>
+        <div class="msg" id="settingsSalonMsg"></div>
+        <button class="btn btn-solid" id="saveSalonBtn">Save</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL: New/Edit Client -->
+<div class="overlay" id="clientModal">
+  <div class="modal">
+    <h2 id="clientModalTitle">Add Client</h2>
+    <input type="hidden" id="clientId" />
+    <div class="field"><label>Full Name</label><input type="text" id="clientName" required /></div>
+    <div class="row2">
+      <div class="field"><label>Phone</label><input type="tel" id="clientPhone" required /></div>
+      <div class="field"><label>Email</label><input type="text" id="clientEmail" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Date of Birth</label><input type="date" id="clientDob" /></div>
+      <div class="field"><label>Gender</label>
+        <select id="clientGender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="clientNotes"></textarea></div>
+    <div class="msg" id="clientMsg"></div>
+    <div class="actions">
+      <button class="btn" id="clientCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="clientSaveBtn">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Appointment -->
+<div class="overlay" id="apptModal">
+  <div class="modal">
+    <h2>New Appointment</h2>
+    <div class="field">
+      <label>Client (search by name/phone)</label>
+      <input type="text" id="apptClientSearch" placeholder="Start typing…" />
+      <div id="apptClientResults" style="margin-top:6px;"></div>
+      <div id="apptClientChosen" class="chip sel" style="display:inline-block;margin-top:8px;" hidden></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Date</label><input type="date" id="apptDate" required /></div>
+      <div class="field"><label>Time</label><input type="time" id="apptTime" required /></div>
+    </div>
+    <div class="field"><label>Staff</label><select id="apptStaff"><option value="">Unassigned</option></select></div>
+    <div class="field">
+      <label>Services</label>
+      <div class="chip-list" id="apptServiceChips"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea id="apptNotes"></textarea></div>
+    <div class="msg" id="apptMsg"></div>
+    <div class="actions">
+      <button class="btn" id="apptCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="apptSaveBtn">Book Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Branch -->
+<div class="overlay" id="branchModal">
+  <div class="modal">
+    <h2>Add Branch / Franchise</h2>
+    <div class="field"><label>Name</label><input type="text" id="branchName" placeholder="e.g. Plaza's Salon — Amritsar" /></div>
+    <div class="field"><label>Code (short, unique)</label><input type="text" id="branchCode" placeholder="e.g. amritsar-01" /></div>
+    <div class="field"><label>Address</label><input type="text" id="branchAddress" /></div>
+    <div class="row2">
+      <div class="field"><label>Opening Time</label><input type="time" id="branchOpen" /></div>
+      <div class="field"><label>Closing Time</label><input type="time" id="branchClose" /></div>
+    </div>
+    <div class="field"><label>Type</label>
+      <select id="branchType"><option value="false">Owned Branch</option><option value="true">Franchise</option></select>
+    </div>
+    <div class="field" id="franchiseOwnerField" hidden><label>Franchise Owner Name</label><input type="text" id="branchOwnerName" /></div>
+    <div class="msg" id="branchMsg"></div>
+    <div class="actions">
+      <button class="btn" id="branchCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="branchSaveBtn">Add Branch</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Staff -->
+<div class="overlay" id="staffModal">
+  <div class="modal">
+    <h2>Add Staff</h2>
+    <div class="field"><label>Full Name</label><input type="text" id="staffName" required /></div>
+    <div class="row2">
+      <div class="field"><label>Role</label><select id="staffRole"><option value="staff">Staff</option><option value="manager">Manager</option></select></div>
+      <div class="field"><label>Branch</label><select id="staffBranch"></select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Phone</label><input type="tel" id="staffPhone" /></div>
+      <div class="field"><label>Password (min 6 chars)</label><input type="text" id="staffPassword" placeholder="Set an initial password" /></div>
+    </div>
+    <div class="msg" id="staffMsg"></div>
+    <div class="actions">
+      <button class="btn" id="staffCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="staffSaveBtn">Create Staff Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Staff Details -->
+<div class="overlay" id="staffDetailModal">
+  <div class="modal wide">
+    <h2 id="staffDetailTitle">Staff Details</h2>
+    <input type="hidden" id="sdProfileId" />
+    <div class="row3">
+      <div class="field"><label>Job Role</label>
+        <select id="sdJobRole"><option value="">—</option><option>Hairdresser</option><option>Beautician</option><option>Receptionist</option><option>Makeup Artist</option><option>Other</option></select>
+      </div>
+      <div class="field"><label>Experience (yrs)</label><input type="number" id="sdExperience" step="0.5" /></div>
+      <div class="field"><label>Shift</label><input type="text" id="sdShift" placeholder="e.g. 10am–7pm" /></div>
+    </div>
+    <div class="field"><label>Address</label><input type="text" id="sdAddress" /></div>
+    <div class="row3">
+      <div class="field"><label>DOB</label><input type="date" id="sdDob" /></div>
+      <div class="field"><label>Gender</label><select id="sdGender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></div>
+      <div class="field"><label>Joining Date</label><input type="date" id="sdJoining" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Emergency Contact Name</label><input type="text" id="sdEmName" /></div>
+      <div class="field"><label>Emergency Contact Phone</label><input type="tel" id="sdEmPhone" /></div>
+    </div>
+    <div class="field"><label>Skills / Certifications</label><textarea id="sdSkills"></textarea></div>
+    <div class="row2">
+      <div class="field"><label>Expected Salary</label><input type="number" id="sdExpSalary" /></div>
+      <div class="field"><label>Current Salary</label><input type="number" id="sdCurSalary" /></div>
+    </div>
+    <div class="doc-check"><input type="checkbox" id="sdAadhaar" /> <label style="margin:0;" for="sdAadhaar">Aadhaar verified</label></div>
+    <div class="doc-check"><input type="checkbox" id="sdPan" /> <label style="margin:0;" for="sdPan">PAN verified</label></div>
+    <div class="doc-check"><input type="checkbox" id="sdEdu" /> <label style="margin:0;" for="sdEdu">Education docs verified</label></div>
+    <div class="field"><label>Notes</label><textarea id="sdNotes"></textarea></div>
+    <div class="msg" id="staffDetailMsg"></div>
+    <div class="actions">
+      <button class="btn" id="staffDetailCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="staffDetailSaveBtn">Save Details</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Candidate -->
+<div class="overlay" id="candidateModal">
+  <div class="modal wide">
+    <h2>Add Candidate</h2>
+    <div class="row2">
+      <div class="field"><label>Full Name</label><input type="text" id="candName" required /></div>
+      <div class="field"><label>Phone</label><input type="tel" id="candPhone" /></div>
+    </div>
+    <div class="field"><label>Address</label><input type="text" id="candAddress" /></div>
+    <div class="row3">
+      <div class="field"><label>DOB</label><input type="date" id="candDob" /></div>
+      <div class="field"><label>Gender</label><select id="candGender"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select></div>
+      <div class="field"><label>Expected Joining</label><input type="date" id="candJoining" /></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Emergency Contact Name</label><input type="text" id="candEmName" /></div>
+      <div class="field"><label>Emergency Contact Phone</label><input type="tel" id="candEmPhone" /></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Job Role Applied</label>
+        <select id="candJobRole"><option>Hairdresser</option><option>Beautician</option><option>Receptionist</option><option>Makeup Artist</option><option>Other</option></select>
+      </div>
+      <div class="field"><label>Experience (yrs)</label><input type="number" id="candExperience" step="0.5" /></div>
+      <div class="field"><label>Shift Preference</label><input type="text" id="candShift" /></div>
+    </div>
+    <div class="field"><label>Skills / Certifications</label><textarea id="candSkills"></textarea></div>
+    <div class="field"><label>Expected Salary</label><input type="number" id="candExpSalary" /></div>
+    <div style="margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:8px;">
+      <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:8px;">Pre-hire document checklist</div>
+      <div class="doc-check"><input type="checkbox" id="candAadhaar" /> <label style="margin:0;" for="candAadhaar">Aadhaar received</label></div>
+      <div class="doc-check"><input type="checkbox" id="candPan" /> <label style="margin:0;" for="candPan">PAN received</label></div>
+      <div class="doc-check"><input type="checkbox" id="candEdu" /> <label style="margin:0;" for="candEdu">Education documents received</label></div>
+    </div>
+    <div class="msg" id="candidateMsg"></div>
+    <div class="actions">
+      <button class="btn" id="candidateCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="candidateSaveBtn">Save Candidate</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Hire Candidate -->
+<div class="overlay" id="hireModal">
+  <div class="modal">
+    <h2>Convert to Staff</h2>
+    <input type="hidden" id="hireCandidateId" />
+    <div class="field"><label>Role</label><select id="hireRole"><option value="staff">Staff</option><option value="manager">Manager</option></select></div>
+    <div class="field"><label>Branch</label><select id="hireBranch"></select></div>
+    <div class="field"><label>Password (min 6 chars)</label><input type="text" id="hirePassword" /></div>
+    <div class="msg" id="hireMsg"></div>
+    <div class="actions">
+      <button class="btn" id="hireCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="hireSaveBtn">Create Account & Mark Hired</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Invoice -->
+<div class="overlay" id="invoiceModal">
+  <div class="modal wide">
+    <h2>New Bill</h2>
+    <div class="field">
+      <label>Client (or leave blank for walk-in)</label>
+      <input type="text" id="invClientSearch" placeholder="Start typing…" />
+      <div id="invClientResults" style="margin-top:6px;"></div>
+      <div id="invClientChosen" class="chip sel" style="display:inline-block;margin-top:8px;" hidden></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Staff who served</label><select id="invStaff"><option value="">—</option></select></div>
+      <div class="field"><label>Payment Method</label><select id="invPayMethod"><option value="cash">Cash</option><option value="card">Card</option><option value="upi">UPI</option></select></div>
+    </div>
+    <div class="field">
+      <label>Add Item</label>
+      <div class="row2">
+        <select id="invAddService"><option value="">+ Add a service…</option></select>
+        <select id="invAddProduct"><option value="">+ Add a product…</option></select>
+      </div>
+    </div>
+    <div id="invItemsBox" style="margin:14px 0;"></div>
+    <div class="row3">
+      <div class="field"><label>Discount (₹)</label><input type="number" id="invDiscount" value="0" /></div>
+      <div class="field"><label>Tax Rate (%)</label><input type="number" id="invTaxRate" value="0" /></div>
+      <div class="field"><label>Total</label><input type="text" id="invTotalDisplay" readonly value="₹0" /></div>
+    </div>
+    <div class="msg" id="invoiceMsg"></div>
+    <div class="actions">
+      <button class="btn" id="invoiceCancelBtn">Cancel</button>
+      <button class="btn btn-solid" id="invoiceSaveBtn">Save Bill</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Receipt -->
+<div class="overlay" id="receiptModal">
+  <div class="modal">
+    <h2>Receipt</h2>
+    <p class="sub" style="margin:-10px 0 16px;">Send this to the customer on WhatsApp. Their Customer ID is printed on it.</p>
+    <div style="background:#fff;border-radius:8px;padding:10px;max-height:48vh;overflow-y:auto;text-align:center;">
+      <canvas id="receiptCanvas" style="max-width:100%;height:auto;display:inline-block;"></canvas>
+    </div>
+    <div class="msg" id="receiptMsg"></div>
+    <div class="actions">
+      <button class="btn" id="receiptCloseBtn">Close</button>
+      <button class="btn" id="receiptSaveBtn">Save Image</button>
+      <button class="btn btn-solid" id="receiptShareBtn">Send on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+var SUPABASE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZmRxamFqdmJvenNrZ2V5eXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2ODY2ODksImV4cCI6MjEwNDI2MjY4OX0.k9tuNpjzkqRnG5kj94tYzE13E-dNOCgpuMALOyS0I2U';
+var EDGE_URL = 'https://bpfdqjajvbozskgeyywy.supabase.co/functions/v1/staff-admin';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+var state = { profile:null, branches:[], services:[], offers:[], products:[], staffList:[], viewingBranchId:null, clients:[],
+  chosenClientId:null, chosenServiceIds:[], invoiceItems:[], invoiceClientId:null, settings:{}, candidates:[] };
+
+function $(id){ return document.getElementById(id); }
+function showMsg(el, text, kind){ el.textContent = text; el.className = 'msg ' + kind; }
+function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ' · ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function fmtTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function fmtMoney(n){ return '₹' + Math.round(Number(n)||0).toLocaleString('en-IN'); }
+function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+function staffAdmin(action, payload){
+  return sb.auth.getSession().then(function(sess){
+    var token = sess.data.session.access_token;
+    return fetch(EDGE_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+      body: JSON.stringify(Object.assign({action:action}, payload))
+    }).then(function(r){ return r.json().then(function(j){ return { status:r.status, body:j }; }); });
+  });
+}
+
+/* ---------------- AUTH ---------------- */
+$('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var idf = $('loginId').value.trim();
+  var pw = $('loginPassword').value;
+  var email = idf.indexOf('@') > -1 ? idf : (idf.toLowerCase() + '@staff.plazasalon.internal');
+  var btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  sb.auth.signInWithPassword({ email: email, password: pw }).then(function(res){
+    btn.disabled = false; btn.textContent = 'Sign In';
+    if (res.error) showMsg($('loginMsg'), res.error.message, 'err');
+  });
+});
+$('signOutLink').addEventListener('click', function(e){ e.preventDefault(); sb.auth.signOut().then(function(){ window.location.reload(); }); });
+
+sb.auth.getSession().then(function(res){ if (res.data && res.data.session) boot(); else showLogin(); });
+sb.auth.onAuthStateChange(function(event, session){ if (session) boot(); else showLogin(); });
+
+function showLogin(){ $('loginView').style.display='flex'; $('appShell').classList.remove('on'); }
+
+function boot(){
+  $('loginView').style.display='none';
+  $('appShell').classList.add('on');
+  sb.auth.getUser().then(function(res){
+    var uid = res.data.user.id;
+    sb.from('profiles').select('*').eq('id', uid).single().then(function(pres){
+      if (pres.error || !pres.data) { setTimeout(boot, 800); return; }
+      state.profile = pres.data;
+      $('whoName').textContent = state.profile.full_name || res.data.user.email;
+      $('whoRole').textContent = state.profile.role;
+      $('whoStaffId').textContent = state.profile.staff_id || '';
+      if (state.profile.role === 'customer') {
+        document.body.innerHTML = '<div class="login-wrap"><div class="login-card"><div class="brand">Plaza <span>OS</span></div><p>Your account isn\'t set up for staff access yet. Ask an owner or manager to give you access.</p></div></div>';
+        return;
+      }
+      var isMgrUp = state.profile.role === 'owner' || state.profile.role === 'manager';
+      if (isMgrUp) { $('navStaff').hidden = false; $('navServices').hidden = false; $('navHiring').hidden = false; $('navReports').hidden = false; }
+      if (state.profile.role === 'owner') $('navSettings').hidden = false;
+      loadBranchesThenApp();
+    });
+  });
+}
+
+function loadBranchesThenApp(){
+  sb.from('branches').select('*').order('created_at').then(function(res){
+    state.branches = res.data || [];
+    if (state.profile.role === 'owner') {
+      $('branchSwitchWrap').hidden = false;
+      var sel = $('branchSwitch');
+      sel.innerHTML = '';
+      state.branches.forEach(function(b){
+        var opt = document.createElement('option'); opt.value = b.id; opt.textContent = b.name; sel.appendChild(opt);
+      });
+      state.viewingBranchId = state.branches[0] ? state.branches[0].id : null;
+      sel.value = state.viewingBranchId;
+      sel.addEventListener('change', function(){ state.viewingBranchId = sel.value; refreshAll(); });
+    } else {
+      state.viewingBranchId = state.profile.branch_id;
+    }
+    loadServices();
+    loadProducts();
+    loadOffers();
+    loadStaffForBranch();
+    loadSettings();
+    refreshAll();
+  });
+}
+
+function loadServices(){
+  sb.from('services').select('*').order('category').then(function(res){ state.services = res.data || []; populateInvoiceServiceSelect(); if($('view-services').classList.contains('active')) renderServiceTable(); });
+}
+function loadProducts(){
+  sb.from('products').select('*').order('name').then(function(res){ state.products = res.data || []; populateInvoiceProductSelect(); });
+}
+function loadOffers(){
+  sb.from('offers').select('*').order('created_at',{ascending:false}).then(function(res){ state.offers = res.data || []; if($('view-services').classList.contains('active')) renderOfferTable(); });
+}
+function loadSettings(){
+  sb.from('app_settings').select('*').then(function(res){
+    (res.data||[]).forEach(function(row){ state.settings[row.key] = row.value; });
+    var loy = state.settings.loyalty_points_per_rupee || {per_rupees:100, points:1};
+    $('loyRateRupees').textContent = loy.per_rupees; $('loyRatePoints').textContent = loy.points;
+    $('setLoyaltyRupees').value = loy.per_rupees; $('setLoyaltyPoints').value = loy.points;
+    var salon = state.settings.salon_info || {name:"Plaza's Salon", gst_rate:18};
+    $('setSalonName').value = salon.name; $('setGstRate').value = salon.gst_rate;
+    $('invTaxRate').value = salon.gst_rate || 0;
+  });
+}
+function loadStaffForBranch(){
+  sb.from('profiles').select('*').in('role',['owner','manager','staff']).then(function(res){
+    state.staffList = res.data || [];
+    var sel = $('apptStaff');
+    sel.innerHTML = '<option value="">Unassigned</option>';
+    var invSel = $('invStaff'); invSel.innerHTML = '<option value="">—</option>';
+    state.staffList.filter(function(p){ return state.profile.role==='owner' || p.branch_id===state.viewingBranchId || p.role==='owner'; })
+      .forEach(function(p){
+        var o=document.createElement('option'); o.value=p.id; o.textContent=(p.full_name||'Staff')+' ('+p.role+')'; sel.appendChild(o);
+        var o2=o.cloneNode(true); invSel.appendChild(o2);
+      });
+    if (state.profile.role !== 'owner') { invSel.value = state.profile.id; }
+  });
+}
+
+function refreshAll(){
+  loadDashboard(); loadAppointments(); loadClients(); loadInbox(); loadLoyalTable(); loadInvoices();
+  if (state.profile.role==='owner' || state.profile.role==='manager') { loadBranchTable(); loadPeopleTable(); loadTeamTable(); loadCandidates(); }
+}
+
+/* ---------------- NAV ---------------- */
+document.querySelectorAll('#navList button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#navList button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    $('view-' + btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'services') { renderServiceTable(); renderOfferTable(); }
+    if (btn.dataset.view === 'reports') { runReports(); }
+  });
+});
+
+/* ---------------- DASHBOARD ---------------- */
+function loadDashboard(){
+  var bid = state.viewingBranchId;
+  var today = todayStr();
+  var todayStart = today + 'T00:00:00';
+  var todayEnd = today + 'T23:59:59';
+  var weekEnd = new Date(Date.now()+7*86400000).toISOString();
+
+  var apQ = sb.from('appointments').select('*, clients(full_name,phone)').gte('start_time', todayStart).lte('start_time', todayEnd).order('start_time');
+  if (bid) apQ = apQ.eq('branch_id', bid);
+  apQ.then(function(res){
+    var rows = res.data || [];
+    $('statToday').textContent = rows.length;
+    var body = $('todayBody'); body.innerHTML = '';
+    if (!rows.length) { $('todayEmpty').hidden=false; $('todayTable').hidden=true; }
+    else {
+      $('todayEmpty').hidden=true; $('todayTable').hidden=false;
+      rows.forEach(function(r){
+        var staffName = staffNameById(r.staff_id);
+        var tr=document.createElement('tr');
+        tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td><td>'+escapeHtml(staffName)+'</td><td><span class="pill pill-'+r.status+'">'+r.status.replace('_',' ')+'</span></td>';
+        body.appendChild(tr);
+      });
+    }
+  });
+
+  var upQ = sb.from('appointments').select('id', {count:'exact', head:true}).gte('start_time', new Date().toISOString()).lte('start_time', weekEnd);
+  if (bid) upQ = upQ.eq('branch_id', bid);
+  upQ.then(function(res){ $('statUpcoming').textContent = res.count || 0; });
+
+  var clQ = sb.from('clients').select('id', {count:'exact', head:true});
+  if (bid) clQ = clQ.eq('branch_id', bid);
+  clQ.then(function(res){ $('statClients').textContent = res.count || 0; });
+
+  sb.from('bookings').select('id',{count:'exact',head:true}).eq('status','new').then(function(res){ $('statNewEnq').textContent = res.count || 0; });
+
+  var invQ = sb.from('invoices').select('total, client_id').gte('created_at', todayStart).lte('created_at', todayEnd);
+  if (bid) invQ = invQ.eq('branch_id', bid);
+  invQ.then(function(res){
+    var rows = res.data || [];
+    var rev = rows.reduce(function(a,r){ return a + Number(r.total||0); }, 0);
+    $('statRevenue').textContent = fmtMoney(rev);
+    var custSet = {}; rows.forEach(function(r){ if (r.client_id) custSet[r.client_id]=1; });
+    $('statCustomers').textContent = Object.keys(custSet).length;
+  });
+
+  loadAttendanceWidget();
+  loadNextCustomer();
+}
+
+function loadAttendanceWidget(){
+  var today = todayStr();
+  sb.from('attendance').select('*').eq('profile_id', state.profile.id).eq('work_date', today).maybeSingle().then(function(res){
+    var rec = res.data;
+    if (!rec) { $('attStatus').textContent = 'Not checked in'; $('checkInBtn').hidden=false; $('checkOutBtn').hidden=true; }
+    else if (rec.check_in && !rec.check_out) { $('attStatus').textContent = 'Checked in at '+fmtTime(rec.check_in); $('checkInBtn').hidden=true; $('checkOutBtn').hidden=false; }
+    else { $('attStatus').textContent = 'Checked in '+fmtTime(rec.check_in)+' · out '+fmtTime(rec.check_out); $('checkInBtn').hidden=true; $('checkOutBtn').hidden=true; }
+  });
+}
+$('checkInBtn').addEventListener('click', function(){
+  sb.from('attendance').insert({ profile_id: state.profile.id, branch_id: state.profile.branch_id || state.viewingBranchId, work_date: todayStr(), check_in: new Date().toISOString(), marked_by: state.profile.id }).then(function(res){
+    if (res.error) alert(res.error.message); else loadAttendanceWidget();
+  });
+});
+$('checkOutBtn').addEventListener('click', function(){
+  sb.from('attendance').update({ check_out: new Date().toISOString() }).eq('profile_id', state.profile.id).eq('work_date', todayStr()).then(function(res){
+    if (res.error) alert(res.error.message); else loadAttendanceWidget();
+  });
+});
+
+function loadNextCustomer(){
+  if (state.profile.role === 'owner') { $('nextCustomerBox').textContent = 'Owners see the branch schedule in Appointments.'; return; }
+  var nowIso = new Date().toISOString();
+  var todayEnd = todayStr()+'T23:59:59';
+  sb.from('appointments').select('*, clients(full_name,phone)').eq('staff_id', state.profile.id).gte('start_time', nowIso).lte('start_time', todayEnd).in('status',['booked','confirmed']).order('start_time').limit(1).then(function(res){
+    var r = res.data && res.data[0];
+    if (!r) { $('nextCustomerBox').innerHTML = '<span class="muted">No more customers scheduled today.</span>'; return; }
+    $('nextCustomerBox').innerHTML = '<strong>'+escapeHtml(r.clients?r.clients.full_name:'Client')+'</strong><br><span class="muted">'+fmtTime(r.start_time)+'</span>';
+  });
+}
+
+function staffNameById(id){ if(!id) return '—'; var p = state.staffList.find(function(x){return x.id===id;}); return p ? (p.full_name||'Staff') : '—'; }
+
+/* ---------------- APPOINTMENTS ---------------- */
+$('apptDateFilter').value = todayStr();
+$('apptTodayBtn').addEventListener('click', function(){ $('apptDateFilter').value = todayStr(); loadAppointments(); });
+$('apptDateFilter').addEventListener('change', loadAppointments);
+
+function loadAppointments(){
+  var date = $('apptDateFilter').value || todayStr();
+  var start = date + 'T00:00:00';
+  var end = date + 'T23:59:59';
+  var q = sb.from('appointments').select('*, clients(full_name,phone), appointment_services(price, services(name))').gte('start_time', start).lte('start_time', end).order('start_time');
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  q.then(function(res){
+    var rows = res.data || [];
+    var body = $('apptBody'); body.innerHTML='';
+    if (!rows.length) { $('apptEmpty').hidden=false; $('apptTable').hidden=true; return; }
+    $('apptEmpty').hidden=true; $('apptTable').hidden=false;
+    rows.forEach(function(r){
+      var svcNames = (r.appointment_services||[]).map(function(s){return s.services?s.services.name:'';}).join(', ') || '—';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+fmtTime(r.start_time)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'')+'</td>'+
+        '<td><a href="https://wa.me/'+((r.clients&&r.clients.phone)||'').replace(/[^\d]/g,'')+'" target="_blank">'+escapeHtml(r.clients?r.clients.phone:'')+'</a></td>'+
+        '<td>'+escapeHtml(svcNames)+'</td><td>'+escapeHtml(staffNameById(r.staff_id))+'</td><td>'+(r.total_amount?(fmtMoney(r.total_amount)):'—')+'</td><td></td>';
+      var statusTd = tr.lastElementChild;
+      var sel = document.createElement('select'); sel.className='status';
+      ['booked','confirmed','in_progress','completed','cancelled','no_show'].forEach(function(s){
+        var o=document.createElement('option'); o.value=s; o.textContent=s.replace('_',' '); if(s===r.status) o.selected=true; sel.appendChild(o);
+      });
+      sel.addEventListener('change', function(){
+        sb.from('appointments').update({status:sel.value}).eq('id',r.id).then(function(res2){
+          if (res2.error) alert('Could not update: '+res2.error.message); else loadDashboard();
+        });
+      });
+      statusTd.appendChild(sel);
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* New appointment modal */
+$('newApptBtn').addEventListener('click', function(){
+  state.chosenClientId = null; state.chosenServiceIds = [];
+  $('apptClientSearch').value=''; $('apptClientResults').innerHTML=''; $('apptClientChosen').hidden=true;
+  $('apptDate').value = $('apptDateFilter').value || todayStr(); $('apptTime').value='';
+  $('apptNotes').value=''; $('apptMsg').className='msg';
+  var chips = $('apptServiceChips'); chips.innerHTML='';
+  state.services.forEach(function(s){
+    var c=document.createElement('div'); c.className='chip'; c.textContent=s.name+' · '+fmtMoney(s.price); c.dataset.id=s.id;
+    c.addEventListener('click', function(){
+      c.classList.toggle('sel');
+      var idx = state.chosenServiceIds.indexOf(s.id);
+      if (idx>-1) state.chosenServiceIds.splice(idx,1); else state.chosenServiceIds.push(s.id);
+    });
+    chips.appendChild(c);
+  });
+  loadStaffForBranch();
+  $('apptModal').classList.add('on');
+});
+$('apptCancelBtn').addEventListener('click', function(){ $('apptModal').classList.remove('on'); });
+
+function clientSearchWidget(inputEl, resultsEl, chosenEl, onPick){
+  var timer;
+  inputEl.addEventListener('input', function(){
+    clearTimeout(timer);
+    var term = inputEl.value.trim();
+    if (term.length<2) { resultsEl.innerHTML=''; return; }
+    timer = setTimeout(function(){
+      var q = sb.from('clients').select('id,full_name,phone').or('full_name.ilike.%'+term+'%,phone.ilike.%'+term+'%').limit(6);
+      if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+      q.then(function(res){
+        resultsEl.innerHTML='';
+        (res.data||[]).forEach(function(c){
+          var d=document.createElement('div'); d.className='chip'; d.style.cursor='pointer'; d.style.display='inline-block'; d.style.marginRight='6px'; d.style.marginBottom='6px';
+          d.textContent = c.full_name+' · '+c.phone;
+          d.addEventListener('click', function(){
+            onPick(c);
+            chosenEl.hidden=false; chosenEl.textContent='Selected: '+c.full_name+' ('+c.phone+')';
+            resultsEl.innerHTML=''; inputEl.value='';
+          });
+          resultsEl.appendChild(d);
+        });
+        if (!res.data || !res.data.length) {
+          var d=document.createElement('div'); d.className='muted'; d.style.fontSize='.82rem'; d.textContent='No match — add this as a new client from the Clients tab first.';
+          resultsEl.appendChild(d);
+        }
+      });
+    }, 300);
+  });
+}
+clientSearchWidget($('apptClientSearch'), $('apptClientResults'), $('apptClientChosen'), function(c){ state.chosenClientId = c.id; });
+clientSearchWidget($('invClientSearch'), $('invClientResults'), $('invClientChosen'), function(c){ state.invoiceClientId = c.id; });
+
+$('apptSaveBtn').addEventListener('click', function(){
+  if (!state.chosenClientId) { showMsg($('apptMsg'),'Pick a client first.','err'); return; }
+  if (!$('apptDate').value || !$('apptTime').value) { showMsg($('apptMsg'),'Pick date & time.','err'); return; }
+  var branchId = state.viewingBranchId;
+  if (!branchId) { showMsg($('apptMsg'),'No branch selected.','err'); return; }
+  var start = $('apptDate').value+'T'+$('apptTime').value+':00';
+  var total = state.services.filter(function(s){return state.chosenServiceIds.indexOf(s.id)>-1;}).reduce(function(a,s){return a+Number(s.price);},0);
+  sb.from('appointments').insert({
+    branch_id: branchId, client_id: state.chosenClientId, staff_id: $('apptStaff').value || null,
+    start_time: start, status:'booked', source:'staff', notes: $('apptNotes').value||null, total_amount: total,
+    created_by: state.profile.id
+  }).select().single().then(function(res){
+    if (res.error) { showMsg($('apptMsg'), res.error.message, 'err'); return; }
+    var apptId = res.data.id;
+    var rows = state.chosenServiceIds.map(function(sid){
+      var svc = state.services.find(function(s){return s.id===sid;});
+      return { appointment_id: apptId, service_id: sid, price: svc?svc.price:0 };
+    });
+    var after = function(){ $('apptModal').classList.remove('on'); loadAppointments(); loadDashboard(); };
+    if (rows.length) sb.from('appointment_services').insert(rows).then(after); else after();
+  });
+});
+
+/* ---------------- BILLING / POS ---------------- */
+function populateInvoiceServiceSelect(){
+  var sel = $('invAddService'); sel.innerHTML = '<option value="">+ Add a service…</option>';
+  state.services.filter(function(s){return s.active;}).forEach(function(s){ var o=document.createElement('option'); o.value=s.id; o.textContent=s.name+' · '+fmtMoney(s.price); sel.appendChild(o); });
+}
+function populateInvoiceProductSelect(){
+  var sel = $('invAddProduct'); sel.innerHTML = '<option value="">+ Add a product…</option>';
+  state.products.forEach(function(p){ var o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+}
+$('invAddService').addEventListener('change', function(){
+  var id = this.value; if (!id) return; this.value='';
+  var s = state.services.find(function(x){return x.id===id;});
+  state.invoiceItems.push({ type:'service', service_id:s.id, description:s.name, qty:1, price:Number(s.price) });
+  renderInvoiceItems();
+});
+$('invAddProduct').addEventListener('change', function(){
+  var id = this.value; if (!id) return; this.value='';
+  var p = state.products.find(function(x){return x.id===id;});
+  state.invoiceItems.push({ type:'product', product_id:p.id, description:p.name, qty:1, price:Number(p.unit_cost||0) });
+  renderInvoiceItems();
+});
+function renderInvoiceItems(){
+  var box = $('invItemsBox'); box.innerHTML='';
+  state.invoiceItems.forEach(function(it, idx){
+    var row = document.createElement('div'); row.className='item-row';
+    var name = document.createElement('div'); name.textContent = it.description; name.style.fontSize='.87rem';
+    var qty = document.createElement('input'); qty.type='number'; qty.value=it.qty; qty.min=1;
+    qty.addEventListener('input', function(){ it.qty = Number(qty.value)||1; updateInvoiceTotal(); });
+    var price = document.createElement('input'); price.type='number'; price.value=it.price;
+    price.addEventListener('input', function(){ it.price = Number(price.value)||0; updateInvoiceTotal(); });
+    var rm = document.createElement('button'); rm.className='rm-btn'; rm.textContent='✕';
+    rm.addEventListener('click', function(){ state.invoiceItems.splice(idx,1); renderInvoiceItems(); });
+    row.appendChild(name); row.appendChild(qty); row.appendChild(price); row.appendChild(rm);
+    box.appendChild(row);
+  });
+  updateInvoiceTotal();
+}
+function updateInvoiceTotal(){
+  var subtotal = state.invoiceItems.reduce(function(a,it){ return a + it.qty*it.price; }, 0);
+  var discount = Number($('invDiscount').value)||0;
+  var taxRate = Number($('invTaxRate').value)||0;
+  var taxable = Math.max(subtotal-discount,0);
+  var tax = taxable*taxRate/100;
+  var total = taxable+tax;
+  $('invTotalDisplay').value = fmtMoney(total);
+  return { subtotal:subtotal, discount:discount, taxRate:taxRate, tax:tax, total:total };
+}
+$('invDiscount').addEventListener('input', updateInvoiceTotal);
+$('invTaxRate').addEventListener('input', updateInvoiceTotal);
+
+$('newInvoiceBtn').addEventListener('click', function(){
+  state.invoiceItems = []; state.invoiceClientId = null;
+  $('invClientSearch').value=''; $('invClientResults').innerHTML=''; $('invClientChosen').hidden=true;
+  $('invDiscount').value=0; $('invPayMethod').value='cash'; $('invoiceMsg').className='msg';
+  renderInvoiceItems();
+  loadStaffForBranch();
+  $('invoiceModal').classList.add('on');
+});
+$('invoiceCancelBtn').addEventListener('click', function(){ $('invoiceModal').classList.remove('on'); });
+$('invoiceSaveBtn').addEventListener('click', function(){
+  if (!state.invoiceItems.length) { showMsg($('invoiceMsg'),'Add at least one item.','err'); return; }
+  var branchId = state.viewingBranchId;
+  if (!branchId) { showMsg($('invoiceMsg'),'No branch selected.','err'); return; }
+  var totals = updateInvoiceTotal();
+  var payload = {
+    branch_id: branchId, client_id: state.invoiceClientId, staff_id: $('invStaff').value || null,
+    subtotal: totals.subtotal, discount: totals.discount, tax_rate: totals.taxRate, tax_amount: totals.tax, total: totals.total,
+    payment_method: $('invPayMethod').value, payment_status:'paid', created_by: state.profile.id
+  };
+  sb.from('invoices').insert(payload).select().single().then(function(res){
+    if (res.error) { showMsg($('invoiceMsg'), res.error.message, 'err'); return; }
+    var invId = res.data.id;
+    var rows = state.invoiceItems.map(function(it){
+      return { invoice_id: invId, service_id: it.service_id||null, product_id: it.product_id||null, description: it.description, qty: it.qty, price: it.price };
+    });
+    sb.from('invoice_items').insert(rows).then(function(){
+      $('invoiceModal').classList.remove('on');
+      loadInvoices(); loadDashboard();
+      // Show the receipt straight away so it can be sent to the customer on WhatsApp.
+      openReceiptModal(res.data);
+    });
+  });
+});
+function loadInvoices(){
+  var q = sb.from('invoices').select('*, clients(full_name), invoice_items(description, qty, price)').order('created_at',{ascending:false}).limit(50);
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  q.then(function(res){
+    var rows = res.data || [];
+    var body = $('invoiceBody'); body.innerHTML='';
+    if (!rows.length) { $('invoiceEmpty').hidden=false; $('invoiceTable').hidden=true; return; }
+    $('invoiceEmpty').hidden=true; $('invoiceTable').hidden=false;
+    rows.forEach(function(r){
+      var itemNames = (r.invoice_items||[]).map(function(i){ return i.description; }).join(', ') || '—';
+      if (itemNames.length > 38) itemNames = itemNames.slice(0,37) + '…';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td class="muted">'+fmtDateTime(r.created_at)+'</td><td>'+escapeHtml(r.clients?r.clients.full_name:'Walk-in')+'</td><td class="muted">'+escapeHtml(itemNames)+'</td><td>'+escapeHtml(r.payment_method)+'</td><td>'+fmtMoney(r.total)+'</td><td>'+(r.loyalty_points_awarded||0)+'</td><td></td>';
+      var actTd = tr.lastElementChild;
+      var rBtn = document.createElement('button'); rBtn.className='btn btn-sm'; rBtn.textContent='Receipt';
+      rBtn.addEventListener('click', function(){ openReceiptModal(r); });
+      actTd.appendChild(rBtn);
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* ---------------- RECEIPT (image for WhatsApp) ---------------- */
+var receiptState = { canvas:null, customerPhone:'', caption:'', fileName:'receipt.png' };
+
+// WhatsApp needs the country code. Indian numbers are stored as 10 digits, so prefix 91.
+function waNumber(phone){
+  var d = String(phone||'').replace(/[^\d]/g,'');
+  if (!d) return '';
+  if (d.length === 11 && d.charAt(0) === '0') d = d.slice(1);
+  if (d.length === 10) d = '91' + d;
+  return d;
+}
+function billNo(id){ return '#' + String(id||'').replace(/-/g,'').slice(-6).toUpperCase(); }
+
+function openReceiptModal(inv){
+  $('receiptMsg').className = 'msg';
+  $('receiptModal').classList.add('on');
+  var branch = state.branches.find(function(b){ return b.id === inv.branch_id; }) || {};
+  var salon = state.settings.salon_info || {};
+  var itemsP = (inv.invoice_items && inv.invoice_items.length)
+    ? Promise.resolve({ data: inv.invoice_items })
+    : sb.from('invoice_items').select('description, qty, price').eq('invoice_id', inv.id);
+  var clientP = inv.client_id
+    ? sb.from('clients').select('full_name, phone, user_id').eq('id', inv.client_id).maybeSingle()
+    : Promise.resolve({ data: null });
+  Promise.all([itemsP, clientP]).then(function(r){
+    var items = r[0].data || [];
+    var client = r[1].data;
+    var finish = function(profile){
+      var d = {
+        salonName: salon.name || "Plaza's Salon",
+        branchName: branch.name || '',
+        branchAddress: branch.address || '',
+        branchPhone: branch.phone || '',
+        billNo: billNo(inv.id),
+        date: fmtDateTime(inv.created_at || new Date().toISOString()),
+        staffName: staffNameById(inv.staff_id),
+        customerName: client ? client.full_name : 'Walk-in customer',
+        customerPhone: client ? (client.phone || '') : '',
+        customerCode: profile && profile.client_code ? profile.client_code : null,
+        items: items,
+        subtotal: Number(inv.subtotal||0), discount: Number(inv.discount||0),
+        taxRate: Number(inv.tax_rate||0), taxAmount: Number(inv.tax_amount||0),
+        total: Number(inv.total||0), payMethod: inv.payment_method || '',
+        pointsEarned: Number(inv.loyalty_points_awarded||0),
+        pointsBalance: profile ? Number(profile.loyalty_points||0) : null
+      };
+      receiptState.customerPhone = d.customerPhone;
+      receiptState.caption = receiptCaption(d);
+      receiptState.fileName = 'receipt-' + d.billNo.replace('#','') + '.png';
+      drawReceipt(d);
+    };
+    if (client && client.user_id) {
+      sb.from('profiles').select('client_code, loyalty_points').eq('id', client.user_id).maybeSingle()
+        .then(function(pr){ finish(pr.data); });
+    } else { finish(null); }
+  });
+}
+
+// "Plaza's Salon — Pathankot" under a "PLAZA'S SALON" heading reads twice, so drop the repeat.
+function shortBranch(branchName, salonName){
+  var b = String(branchName||'').trim(), s = String(salonName||'').trim();
+  if (!b || !s) return b;
+  if (b.toLowerCase().indexOf(s.toLowerCase()) === 0) {
+    var rest = b.slice(s.length).replace(/^[\s—\-–,·]+/, '').trim();
+    return rest || b;
+  }
+  return b;
+}
+function payLabel(m){
+  m = String(m||'').toLowerCase();
+  if (m === 'upi') return 'UPI';
+  if (!m) return '';
+  return m.charAt(0).toUpperCase() + m.slice(1);
+}
+
+function receiptCaption(d){
+  var L = [];
+  var sub = shortBranch(d.branchName, d.salonName);
+  L.push('*' + d.salonName + '*' + (sub ? ' — ' + sub : ''));
+  L.push('Bill ' + d.billNo + ' · ' + d.date);
+  L.push('');
+  L.push('Total paid: ' + fmtMoney(d.total) + ' (' + payLabel(d.payMethod) + ')');
+  if (d.customerCode) {
+    L.push('Your Customer ID: *' + d.customerCode + '*');
+    if (d.pointsEarned) L.push('Points earned: +' + d.pointsEarned);
+    if (d.pointsBalance !== null) L.push('Points balance: ' + d.pointsBalance);
+    L.push('');
+    L.push('Show your Customer ID on your next visit to redeem points.');
+  }
+  L.push('');
+  L.push('Thank you for visiting!');
+  return L.join('\n');
+}
+
+function drawReceipt(d){
+  // Wait for the brand webfonts so the canvas text matches the salon's look.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ drawReceiptNow(d); });
+  else drawReceiptNow(d);
+}
+
+function drawReceiptNow(d){
+  var S = 2, W = 760, pad = 44;
+  var GOLD = '#a5801f', INK = '#1a1a1a', MUTE = '#6b6b6b', LINE = '#dcdcdc';
+  var SERIF = "'Bodoni Moda', Georgia, 'Times New Roman', serif";
+  var SANS = "'Jost', Arial, Helvetica, sans-serif";
+  var tmp = document.createElement('canvas');
+  tmp.width = W * S; tmp.height = 2600 * S;
+  var g = tmp.getContext('2d');
+  g.scale(S, S);
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, 2600);
+  g.textBaseline = 'alphabetic';
+
+  function text(t, x, yy, o){
+    o = o || {};
+    g.fillStyle = o.color || INK;
+    g.font = (o.weight || '400') + ' ' + (o.size || 17) + 'px ' + (o.font || SANS);
+    g.textAlign = o.align || 'left';
+    g.fillText(String(t), x, yy);
+  }
+  function rule(yy){
+    g.strokeStyle = LINE; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(pad, yy + 0.5); g.lineTo(W - pad, yy + 0.5); g.stroke();
+  }
+  function row(label, value, yy, o){
+    o = o || {};
+    text(label, pad, yy, { size: o.size || 16, color: o.labelColor || MUTE });
+    text(value, W - pad, yy, { size: o.size || 16, align: 'right', weight: o.weight || '400', color: o.valueColor || INK, font: o.font });
+  }
+
+  var y = 72;
+  // ---- header ----
+  text(d.salonName.toUpperCase(), W/2, y, { size: 36, weight: '600', font: SERIF, align: 'center' });
+  y += 32;
+  var subHead = shortBranch(d.branchName, d.salonName);
+  if (subHead) { text(subHead, W/2, y, { size: 17, align: 'center', color: GOLD }); y += 25; }
+  if (d.branchAddress) { text(d.branchAddress, W/2, y, { size: 14, align: 'center', color: MUTE }); y += 21; }
+  if (d.branchPhone) { text('Ph: ' + d.branchPhone, W/2, y, { size: 14, align: 'center', color: MUTE }); y += 21; }
+  y += 14; rule(y); y += 34;
+
+  // ---- bill meta ----
+  row('Bill No', d.billNo, y, { weight: '600' }); y += 27;
+  row('Date', d.date, y); y += 27;
+  if (d.staffName && d.staffName !== '—') { row('Served by', d.staffName, y); y += 27; }
+  y += 8; rule(y); y += 34;
+
+  // ---- customer ----
+  text('CUSTOMER', pad, y, { size: 12, weight: '600', color: GOLD }); y += 27;
+  text(d.customerName, pad, y, { size: 19, weight: '600' }); y += 25;
+  if (d.customerPhone) { text(d.customerPhone, pad, y, { size: 15, color: MUTE }); y += 25; }
+  if (d.customerCode) {
+    y += 8;
+    var bh = 64;
+    g.fillStyle = '#fdf7e6'; g.strokeStyle = GOLD; g.lineWidth = 1.5;
+    g.beginPath(); g.rect(pad, y, W - pad*2, bh); g.fill(); g.stroke();
+    text('YOUR CUSTOMER ID', W/2, y + 25, { size: 12, weight: '600', color: GOLD, align: 'center' });
+    text(d.customerCode, W/2, y + 52, { size: 24, weight: '600', font: SERIF, align: 'center' });
+    y += bh + 8;
+  }
+  y += 14; rule(y); y += 32;
+
+  // ---- items ----
+  text('ITEM', pad, y, { size: 12, weight: '600', color: GOLD });
+  text('QTY', W - pad - 140, y, { size: 12, weight: '600', color: GOLD, align: 'right' });
+  text('AMOUNT', W - pad, y, { size: 12, weight: '600', color: GOLD, align: 'right' });
+  y += 12; rule(y); y += 30;
+  var items = d.items.length ? d.items : [{ description: 'Service', qty: 1, price: d.subtotal }];
+  items.forEach(function(it){
+    var name = String(it.description || 'Item');
+    if (name.length > 32) name = name.slice(0, 31) + '…';
+    var qty = Number(it.qty) || 1;
+    text(name, pad, y, { size: 17 });
+    text(qty, W - pad - 140, y, { size: 17, align: 'right' });
+    text(fmtMoney(qty * Number(it.price || 0)), W - pad, y, { size: 17, align: 'right' });
+    y += 31;
+  });
+  y += 4; rule(y); y += 32;
+
+  // ---- totals ----
+  row('Subtotal', fmtMoney(d.subtotal), y); y += 27;
+  if (d.discount) { row('Discount', '- ' + fmtMoney(d.discount), y); y += 27; }
+  if (d.taxAmount) { row('GST (' + d.taxRate + '%)', fmtMoney(d.taxAmount), y); y += 27; }
+  y += 8; rule(y); y += 40;
+  text('TOTAL PAID', pad, y, { size: 19, weight: '600' });
+  text(fmtMoney(d.total), W - pad, y, { size: 27, weight: '600', font: SERIF, align: 'right' });
+  y += 25;
+  text('Paid by ' + payLabel(d.payMethod), W - pad, y, { size: 14, color: MUTE, align: 'right' });
+  y += 26; rule(y); y += 32;
+
+  // ---- loyalty ----
+  if (d.customerCode) {
+    text('LOYALTY POINTS', pad, y, { size: 12, weight: '600', color: GOLD }); y += 28;
+    row('Earned this visit', '+' + d.pointsEarned, y, { weight: '600' }); y += 26;
+    if (d.pointsBalance !== null) { row('Total balance', d.pointsBalance, y, { weight: '600' }); y += 26; }
+    y += 8;
+    text('Show your Customer ID on your next visit', pad, y, { size: 14, color: MUTE }); y += 20;
+    text('to redeem your points.', pad, y, { size: 14, color: MUTE }); y += 24;
+    rule(y); y += 32;
+  } else if (d.customerPhone) {
+    text('Sign in on our website with this phone number', pad, y, { size: 14, color: MUTE }); y += 20;
+    text('to start earning loyalty points on every visit.', pad, y, { size: 14, color: MUTE }); y += 24;
+    rule(y); y += 32;
+  }
+
+  // ---- footer ----
+  text('Thank you for visiting!', W/2, y, { size: 20, font: SERIF, align: 'center', color: GOLD }); y += 28;
+  text('We look forward to seeing you again.', W/2, y, { size: 14, align: 'center', color: MUTE });
+  y += pad;
+
+  // crop the tall scratch canvas down to what we actually drew
+  var out = $('receiptCanvas');
+  out.width = W * S; out.height = Math.round(y) * S;
+  var og = out.getContext('2d');
+  og.fillStyle = '#ffffff'; og.fillRect(0, 0, out.width, out.height);
+  og.drawImage(tmp, 0, 0);
+  out.style.width = W + 'px';
+  receiptState.canvas = out;
+}
+
+function receiptBlob(cb){
+  var cv = receiptState.canvas;
+  if (!cv) return;
+  if (cv.toBlob) cv.toBlob(function(b){ cb(b); }, 'image/png');
+  else cb(dataUrlToBlob(cv.toDataURL('image/png')));
+}
+function dataUrlToBlob(url){
+  var parts = url.split(','), bin = atob(parts[1]), arr = new Uint8Array(bin.length);
+  for (var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: 'image/png' });
+}
+function downloadBlob(blob){
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = receiptState.fileName;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+}
+function waFallback(blob){
+  // Desktop browsers can't attach a file to WhatsApp from a link, so save the image
+  // and open the chat with the details pre-typed for the staff member to attach.
+  downloadBlob(blob);
+  var num = waNumber(receiptState.customerPhone);
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(receiptState.caption), '_blank');
+  showMsg($('receiptMsg'), 'Receipt image saved and WhatsApp opened — attach the saved image in the chat. On a phone or tablet it attaches by itself.', 'ok');
+}
+
+$('receiptCloseBtn').addEventListener('click', function(){ $('receiptModal').classList.remove('on'); });
+$('receiptSaveBtn').addEventListener('click', function(){
+  receiptBlob(function(b){ downloadBlob(b); showMsg($('receiptMsg'), 'Receipt image saved.', 'ok'); });
+});
+$('receiptShareBtn').addEventListener('click', function(){
+  var btn = this; btn.disabled = true;
+  receiptBlob(function(blob){
+    btn.disabled = false;
+    var file;
+    try { file = new File([blob], receiptState.fileName, { type: 'image/png' }); } catch(e) { file = null; }
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], text: receiptState.caption }).then(function(){
+        showMsg($('receiptMsg'), 'Receipt sent.', 'ok');
+      }).catch(function(err){
+        if (err && err.name === 'AbortError') return;
+        waFallback(blob);
+      });
+    } else {
+      waFallback(blob);
+    }
+  });
+});
+
+/* ---------------- CLIENTS ---------------- */
+function loadClients(term){
+  var q = sb.from('clients').select('*').order('created_at',{ascending:false});
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  if (term) q = q.or('full_name.ilike.%'+term+'%,phone.ilike.%'+term+'%');
+  q.then(function(res){
+    state.clients = res.data || [];
+    var body = $('clientBody'); body.innerHTML='';
+    if (!state.clients.length) { $('clientEmpty').hidden=false; $('clientTable').hidden=true; return; }
+    $('clientEmpty').hidden=true; $('clientTable').hidden=false;
+    // Loyalty points live on the customer's online account (profiles), not on this walk-in
+    // record -- so pull the real balance for anyone who has logged in and linked their phone.
+    var userIds = state.clients.map(function(c){ return c.user_id; }).filter(Boolean);
+    var renderRows = function(pointsMap){
+      body.innerHTML='';
+      state.clients.forEach(function(c){
+        var linked = c.user_id && pointsMap[c.user_id] !== undefined;
+        var ptsCell = linked
+          ? String(pointsMap[c.user_id])
+          : '<span class="muted" title="Points only start counting once this customer signs in on the website with this same phone number">0 (not logged in)</span>';
+        var tr=document.createElement('tr'); tr.className='clickable';
+        tr.innerHTML = '<td>'+escapeHtml(c.full_name)+'</td><td>'+escapeHtml(c.phone)+'</td><td class="muted">'+((c.tags||[]).join(', ')||'—')+'</td><td>'+ptsCell+'</td><td class="muted">'+fmtDateTime(c.created_at)+'</td>';
+        tr.addEventListener('click', function(){ openClientModal(c); });
+        body.appendChild(tr);
+      });
+    };
+    if (!userIds.length) { renderRows({}); return; }
+    sb.from('profiles').select('id, loyalty_points').in('id', userIds).then(function(pres){
+      var map = {};
+      (pres.data||[]).forEach(function(p){ map[p.id] = p.loyalty_points; });
+      renderRows(map);
+    });
+  });
+}
+var clientSearchTimer2;
+$('clientSearch').addEventListener('input', function(){
+  clearTimeout(clientSearchTimer2);
+  var v = this.value.trim();
+  clientSearchTimer2 = setTimeout(function(){ loadClients(v); }, 300);
+});
+
+function openClientModal(c){
+  $('clientModalTitle').textContent = c ? 'Edit Client' : 'Add Client';
+  $('clientId').value = c ? c.id : '';
+  $('clientName').value = c ? c.full_name : '';
+  $('clientPhone').value = c ? c.phone : '';
+  $('clientEmail').value = c && c.email ? c.email : '';
+  $('clientDob').value = c && c.dob ? c.dob : '';
+  $('clientGender').value = c && c.gender ? c.gender : '';
+  $('clientNotes').value = c && c.notes ? c.notes : '';
+  $('clientMsg').className='msg';
+  $('clientModal').classList.add('on');
+}
+$('newClientBtn').addEventListener('click', function(){ openClientModal(null); });
+$('clientCancelBtn').addEventListener('click', function(){ $('clientModal').classList.remove('on'); });
+$('clientSaveBtn').addEventListener('click', function(){
+  var name = $('clientName').value.trim(), phone = $('clientPhone').value.trim();
+  if (!name || !phone) { showMsg($('clientMsg'),'Name and phone are required.','err'); return; }
+  var payload = { full_name:name, phone:phone, email:$('clientEmail').value.trim()||null, dob:$('clientDob').value||null, gender:$('clientGender').value||null, notes:$('clientNotes').value||null };
+  var id = $('clientId').value;
+  var p;
+  if (id) p = sb.from('clients').update(payload).eq('id', id);
+  else { payload.branch_id = state.viewingBranchId; payload.created_by = state.profile.id; p = sb.from('clients').insert(payload); }
+  p.then(function(res){
+    if (res.error) { showMsg($('clientMsg'), res.error.message, 'err'); return; }
+    $('clientModal').classList.remove('on'); loadClients(); loadDashboard();
+  });
+});
+
+/* ---------------- WEBSITE ENQUIRIES (legacy bookings) ---------------- */
+function loadInbox(){
+  sb.from('bookings').select('*').order('created_at',{ascending:false}).limit(100).then(function(res){
+    var rows = res.data || [];
+    var body = $('inboxBody'); body.innerHTML='';
+    if (!rows.length) { $('inboxEmpty').hidden=false; $('inboxTable').hidden=true; return; }
+    $('inboxEmpty').hidden=true; $('inboxTable').hidden=false;
+    rows.forEach(function(r){
+      var preferred = [r.preferred_date, r.preferred_time].filter(Boolean).join(' · ') || '—';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td class="muted">'+fmtDateTime(r.created_at)+'</td><td>'+escapeHtml(r.name)+'</td><td>'+escapeHtml(r.phone)+'</td><td><span class="pill pill-booked">'+r.source+'</span></td><td>'+escapeHtml(r.service||'—')+'</td><td class="muted">'+escapeHtml(preferred)+'</td><td></td><td></td>';
+      var statusTd = tr.children[6];
+      var sel=document.createElement('select'); sel.className='status';
+      ['new','contacted','confirmed','done','cancelled'].forEach(function(s){ var o=document.createElement('option'); o.value=s; o.textContent=s; if(s===r.status) o.selected=true; sel.appendChild(o); });
+      sel.addEventListener('change', function(){ sb.from('bookings').update({status:sel.value}).eq('id',r.id).then(loadDashboard); });
+      statusTd.appendChild(sel);
+      var actionTd = tr.lastElementChild;
+      var convBtn=document.createElement('button'); convBtn.className='btn'; convBtn.style.fontSize='.75rem'; convBtn.style.padding='6px 10px'; convBtn.textContent='→ Client';
+      convBtn.addEventListener('click', function(){ convertEnquiryToClient(r); });
+      actionTd.appendChild(convBtn);
+      body.appendChild(tr);
+    });
+  });
+}
+function convertEnquiryToClient(r){
+  if (!state.viewingBranchId) { alert('Pick a branch first.'); return; }
+  sb.from('clients').select('id').eq('phone', r.phone).eq('branch_id', state.viewingBranchId).maybeSingle().then(function(res){
+    if (res.data) { alert('Client already exists — opening Clients tab.'); document.querySelector('[data-view=clients]').click(); loadClients(); return; }
+    sb.from('clients').insert({ branch_id: state.viewingBranchId, full_name:r.name, phone:r.phone, notes:'From website enquiry: '+(r.service||''), created_by: state.profile.id }).then(function(){
+      alert('Client added — open Appointments to book their slot.');
+      loadClients();
+    });
+  });
+}
+
+/* ---------------- LOYALTY POINTS ---------------- */
+var loyaltyCurrent = null;
+$('loyaltyLookupBtn').addEventListener('click', function(){
+  var code = $('loyaltyCodeInput').value.trim().toUpperCase();
+  if (!code) { showMsg($('loyaltyLookupMsg'), 'Enter a customer ID.', 'err'); return; }
+  sb.rpc('lookup_customer_by_code', { p_client_code: code }).then(function(res){
+    if (res.error || !res.data || !res.data.length) {
+      showMsg($('loyaltyLookupMsg'), res.error ? res.error.message : 'No customer found with that ID.', 'err');
+      $('loyaltyCustomerCard').hidden = true;
+      return;
+    }
+    loyaltyCurrent = res.data[0];
+    $('loyaltyLookupMsg').className = 'msg';
+    $('loyaltyCustomerCard').hidden = false;
+    $('loyaltyCustName').textContent = loyaltyCurrent.full_name || 'Customer';
+    $('loyaltyCustPhone').textContent = loyaltyCurrent.phone || '';
+    $('loyaltyCustBalance').textContent = loyaltyCurrent.loyalty_points;
+    $('redeemMsg').className = 'msg';
+  });
+});
+$('redeemBtn').addEventListener('click', function(){
+  if (!loyaltyCurrent) return;
+  var points = parseInt($('redeemPoints').value, 10);
+  var reward = $('redeemReward').value.trim() || null;
+  sb.rpc('redeem_loyalty_points', { p_client_code: loyaltyCurrent.client_code, p_points: points, p_reward: reward, p_branch_id: state.viewingBranchId }).then(function(res){
+    if (res.error) { showMsg($('redeemMsg'), res.error.message, 'err'); return; }
+    var newBalance = res.data && res.data[0] ? res.data[0].new_balance : (loyaltyCurrent.loyalty_points - points);
+    loyaltyCurrent.loyalty_points = newBalance;
+    $('loyaltyCustBalance').textContent = newBalance;
+    showMsg($('redeemMsg'), 'Redeemed ' + points + ' points. New balance: ' + newBalance + '.', 'ok');
+    $('redeemReward').value = '';
+  });
+});
+function loadLoyalTable(){
+  sb.from('loyal_customers').select('*').limit(25).then(function(res){
+    var rows = res.data || [];
+    var body = $('loyalBody'); body.innerHTML='';
+    if (!rows.length) { $('loyalEmpty').hidden=false; $('loyalTable').hidden=true; return; }
+    $('loyalEmpty').hidden=true; $('loyalTable').hidden=false;
+    rows.forEach(function(r){
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(r.full_name||'—')+'</td><td class="muted">'+escapeHtml(r.phone||'—')+'</td><td>'+r.loyalty_points+'</td>';
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* ---------------- SERVICES & OFFERS ---------------- */
+function renderServiceTable(){
+  var body = $('serviceBody'); body.innerHTML='';
+  state.services.forEach(function(s){
+    var tr=document.createElement('tr');
+    tr.innerHTML = '<td>'+escapeHtml(s.name)+'</td><td class="muted">'+escapeHtml(s.category||'—')+'</td><td>'+fmtMoney(s.price)+'</td><td>'+s.duration_minutes+' min</td><td>'+(s.active?'Yes':'No')+'</td><td></td>';
+    var actionTd = tr.lastElementChild;
+    var editBtn = document.createElement('button'); editBtn.className='btn btn-sm'; editBtn.textContent='Edit';
+    editBtn.addEventListener('click', function(){ openServicePrompt(s); });
+    var toggleBtn = document.createElement('button'); toggleBtn.className='btn btn-sm'; toggleBtn.style.marginLeft='6px'; toggleBtn.textContent = s.active ? 'Deactivate' : 'Activate';
+    toggleBtn.addEventListener('click', function(){ sb.from('services').update({active: !s.active}).eq('id', s.id).then(loadServices); });
+    actionTd.appendChild(editBtn); actionTd.appendChild(toggleBtn);
+    body.appendChild(tr);
+  });
+}
+function openServicePrompt(s){
+  var name = prompt('Service name', s ? s.name : '');
+  if (name===null) return;
+  var category = prompt('Category', s ? (s.category||'') : '') || null;
+  var price = Number(prompt('Price (₹)', s ? s.price : '0')) || 0;
+  var duration = Number(prompt('Duration (minutes)', s ? s.duration_minutes : '30')) || 30;
+  var payload = { name:name, category:category, price:price, duration_minutes:duration, branch_id: state.viewingBranchId };
+  if (s) sb.from('services').update(payload).eq('id', s.id).then(loadServices);
+  else sb.from('services').insert(Object.assign(payload,{active:true})).then(loadServices);
+}
+$('newServiceBtn').addEventListener('click', function(){ openServicePrompt(null); });
+
+function renderOfferTable(){
+  var body = $('offerBody'); body.innerHTML='';
+  state.offers.forEach(function(o){
+    var tr=document.createElement('tr');
+    var disc = o.discount_type==='percent' ? o.discount_value+'%' : fmtMoney(o.discount_value);
+    var valid = [o.valid_from,o.valid_to].filter(Boolean).join(' → ') || 'Always';
+    tr.innerHTML = '<td>'+escapeHtml(o.title)+'</td><td>'+disc+'</td><td class="muted">'+valid+'</td><td>'+(o.active?'Yes':'No')+'</td><td></td>';
+    var actionTd = tr.lastElementChild;
+    var toggleBtn = document.createElement('button'); toggleBtn.className='btn btn-sm'; toggleBtn.textContent = o.active ? 'Deactivate' : 'Activate';
+    toggleBtn.addEventListener('click', function(){ sb.from('offers').update({active: !o.active}).eq('id', o.id).then(loadOffers); });
+    actionTd.appendChild(toggleBtn);
+    body.appendChild(tr);
+  });
+}
+$('newOfferBtn').addEventListener('click', function(){
+  var title = prompt('Offer title'); if (!title) return;
+  var description = prompt('Description') || null;
+  var discountType = (prompt('Discount type: percent or flat', 'percent')||'percent').trim();
+  var discountValue = Number(prompt('Discount value', '10')) || 0;
+  var validFrom = prompt('Valid from (YYYY-MM-DD, optional)') || null;
+  var validTo = prompt('Valid to (YYYY-MM-DD, optional)') || null;
+  sb.from('offers').insert({ title:title, description:description, discount_type:discountType==='flat'?'flat':'percent', discount_value:discountValue, valid_from:validFrom, valid_to:validTo, branch_id: state.viewingBranchId, active:true }).then(loadOffers);
+});
+
+/* ---------------- STAFF & BRANCHES ---------------- */
+function loadBranchTable(){
+  sb.from('branches').select('*').order('created_at').then(function(res){
+    var body = $('branchBody'); body.innerHTML='';
+    (res.data||[]).forEach(function(b){
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(b.name)+'</td><td class="muted">'+escapeHtml(b.code)+'</td><td>'+(b.is_franchise?'Franchise ('+escapeHtml(b.franchise_owner_name||'—')+')':'Owned')+'</td><td>'+(b.active?'Yes':'No')+'</td>';
+      body.appendChild(tr);
+    });
+  });
+}
+$('branchType').addEventListener('change', function(){ $('franchiseOwnerField').hidden = this.value !== 'true'; });
+$('newBranchBtn').addEventListener('click', function(){
+  $('branchName').value=''; $('branchCode').value=''; $('branchAddress').value=''; $('branchOpen').value=''; $('branchClose').value=''; $('branchType').value='false'; $('branchOwnerName').value=''; $('franchiseOwnerField').hidden=true; $('branchMsg').className='msg';
+  $('branchModal').classList.add('on');
+});
+$('branchCancelBtn').addEventListener('click', function(){ $('branchModal').classList.remove('on'); });
+$('branchSaveBtn').addEventListener('click', function(){
+  var name=$('branchName').value.trim(), code=$('branchCode').value.trim();
+  if (!name||!code) { showMsg($('branchMsg'),'Name and code are required.','err'); return; }
+  sb.from('branches').insert({ name:name, code:code, address:$('branchAddress').value.trim()||null, opening_time:$('branchOpen').value||null, closing_time:$('branchClose').value||null, is_franchise: $('branchType').value==='true', franchise_owner_name: $('branchOwnerName').value.trim()||null }).then(function(res){
+    if (res.error) { showMsg($('branchMsg'), res.error.message, 'err'); return; }
+    $('branchModal').classList.remove('on'); loadBranchesThenApp();
+  });
+});
+
+function populateBranchSelect(sel){
+  sel.innerHTML='';
+  state.branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sel.appendChild(o); });
+}
+$('newStaffBtn').addEventListener('click', function(){
+  $('staffName').value=''; $('staffPhone').value=''; $('staffPassword').value=''; $('staffMsg').className='msg';
+  populateBranchSelect($('staffBranch'));
+  if (state.profile.role==='manager') { $('staffRole').value='staff'; $('staffRole').disabled=true; $('staffBranch').value=state.profile.branch_id; $('staffBranch').disabled=true; }
+  else { $('staffRole').disabled=false; $('staffBranch').disabled=false; if (state.viewingBranchId) $('staffBranch').value = state.viewingBranchId; }
+  $('staffModal').classList.add('on');
+});
+$('staffCancelBtn').addEventListener('click', function(){ $('staffModal').classList.remove('on'); });
+$('staffSaveBtn').addEventListener('click', function(){
+  var name = $('staffName').value.trim(); var pw = $('staffPassword').value;
+  if (!name) { showMsg($('staffMsg'),'Name is required.','err'); return; }
+  if (!pw || pw.length<6) { showMsg($('staffMsg'),'Password must be at least 6 characters.','err'); return; }
+  staffAdmin('create_staff', { full_name:name, role:$('staffRole').value, branch_id:$('staffBranch').value, password:pw, phone:$('staffPhone').value.trim()||null }).then(function(res){
+    if (res.status !== 200) { showMsg($('staffMsg'), res.body.error || 'Could not create staff.', 'err'); return; }
+    showMsg($('staffMsg'), 'Created! Staff ID: '+res.body.staff_id+' — share this ID and the password you set with them to log in.', 'ok');
+    loadTeamTable(); loadPeopleTable(); loadStaffForBranch();
+  });
+});
+
+function loadTeamTable(){
+  sb.from('profiles').select('*').in('role',['owner','manager','staff']).order('staff_id').then(function(res){
+    var rows = res.data || [];
+    var body = $('teamBody'); body.innerHTML='';
+    rows.forEach(function(p){
+      var branchName = state.branches.find(function(b){return b.id===p.branch_id;});
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(p.staff_id||'—')+'</td><td>'+escapeHtml(p.full_name||'—')+'</td><td><span class="pill pill-'+p.role+'">'+p.role+'</span></td><td class="muted">'+escapeHtml(branchName?branchName.name:'All')+'</td><td>'+(p.active?'<span class="pill pill-active">active</span>':'<span class="pill pill-terminated">inactive</span>')+'</td><td></td>';
+      var actionTd = tr.lastElementChild;
+      var detailsBtn = document.createElement('button'); detailsBtn.className='btn btn-sm'; detailsBtn.textContent='Details';
+      detailsBtn.addEventListener('click', function(){ openStaffDetailModal(p); });
+      var pwBtn = document.createElement('button'); pwBtn.className='btn btn-sm'; pwBtn.style.marginLeft='6px'; pwBtn.textContent='Set Password';
+      pwBtn.addEventListener('click', function(){
+        var np = prompt('New password for '+(p.full_name||p.staff_id)+' (min 6 chars)');
+        if (!np) return;
+        staffAdmin('set_password', { profile_id:p.id, password:np }).then(function(res2){
+          if (res2.status!==200) alert(res2.body.error||'Could not set password.'); else alert('Password updated.');
+        });
+      });
+      actionTd.appendChild(detailsBtn); actionTd.appendChild(pwBtn);
+      if (p.role !== 'owner') {
+        var toggleBtn = document.createElement('button'); toggleBtn.className='btn btn-sm'; toggleBtn.style.marginLeft='6px';
+        toggleBtn.textContent = p.active ? 'Deactivate' : 'Reactivate';
+        toggleBtn.addEventListener('click', function(){
+          var action = p.active ? 'deactivate_staff' : 'reactivate_staff';
+          if (p.active && !confirm('Deactivate '+(p.full_name||p.staff_id)+'? They will no longer be able to sign in.')) return;
+          staffAdmin(action, { profile_id:p.id }).then(function(res2){
+            if (res2.status!==200) alert(res2.body.error||'Could not update.'); else { loadTeamTable(); loadPeopleTable(); }
+          });
+        });
+        actionTd.appendChild(toggleBtn);
+      }
+      body.appendChild(tr);
+    });
+  });
+}
+
+function openStaffDetailModal(p){
+  $('sdProfileId').value = p.id;
+  $('staffDetailTitle').textContent = 'Staff Details — '+(p.full_name||p.staff_id);
+  $('staffDetailMsg').className='msg';
+  sb.from('staff_details').select('*').eq('profile_id', p.id).maybeSingle().then(function(res){
+    var d = res.data || {};
+    $('sdJobRole').value = d.job_role||''; $('sdExperience').value = d.experience_years||''; $('sdShift').value = d.shift||'';
+    $('sdAddress').value = d.address||''; $('sdDob').value = d.dob||''; $('sdGender').value = d.gender||''; $('sdJoining').value = d.joining_date||'';
+    $('sdEmName').value = d.emergency_contact_name||''; $('sdEmPhone').value = d.emergency_contact_phone||'';
+    $('sdSkills').value = d.skills||''; $('sdExpSalary').value = d.expected_salary||''; $('sdCurSalary').value = d.current_salary||'';
+    $('sdAadhaar').checked = !!d.aadhaar_verified; $('sdPan').checked = !!d.pan_verified; $('sdEdu').checked = !!d.education_verified;
+    $('sdNotes').value = d.notes||'';
+    $('staffDetailModal').classList.add('on');
+  });
+}
+$('staffDetailCancelBtn').addEventListener('click', function(){ $('staffDetailModal').classList.remove('on'); });
+$('staffDetailSaveBtn').addEventListener('click', function(){
+  var payload = {
+    profile_id: $('sdProfileId').value, job_role: $('sdJobRole').value||null, experience_years: $('sdExperience').value||null, shift: $('sdShift').value||null,
+    address: $('sdAddress').value||null, dob: $('sdDob').value||null, gender: $('sdGender').value||null, joining_date: $('sdJoining').value||null,
+    emergency_contact_name: $('sdEmName').value||null, emergency_contact_phone: $('sdEmPhone').value||null,
+    skills: $('sdSkills').value||null, expected_salary: $('sdExpSalary').value||null, current_salary: $('sdCurSalary').value||null,
+    aadhaar_verified: $('sdAadhaar').checked, pan_verified: $('sdPan').checked, education_verified: $('sdEdu').checked, notes: $('sdNotes').value||null
+  };
+  sb.from('staff_details').upsert(payload, {onConflict:'profile_id'}).then(function(res){
+    if (res.error) { showMsg($('staffDetailMsg'), res.error.message, 'err'); return; }
+    $('staffDetailModal').classList.remove('on');
+  });
+});
+
+function loadPeopleTable(){
+  sb.from('profiles').select('*').order('created_at',{ascending:false}).then(function(res){
+    var body = $('peopleBody'); body.innerHTML='';
+    (res.data||[]).forEach(function(p){
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(p.full_name||'—')+'</td><td></td><td></td><td>'+(p.active?'Yes':'No')+'</td>';
+      var roleTd = tr.children[1];
+      var roleSel = document.createElement('select'); roleSel.className='status';
+      ['owner','manager','staff','customer'].forEach(function(r){ var o=document.createElement('option'); o.value=r; o.textContent=r; if(r===p.role) o.selected=true; roleSel.appendChild(o); });
+      roleSel.addEventListener('change', function(){ sb.from('profiles').update({role:roleSel.value}).eq('id',p.id).then(function(){ loadPeopleTable(); loadTeamTable(); }); });
+      roleTd.appendChild(roleSel);
+      var branchTd = tr.children[2];
+      var branchSel = document.createElement('select'); branchSel.className='status';
+      var noneOpt = document.createElement('option'); noneOpt.value=''; noneOpt.textContent='— (all/owner)'; branchSel.appendChild(noneOpt);
+      state.branches.forEach(function(b){ var o=document.createElement('option'); o.value=b.id; o.textContent=b.name; if(p.branch_id===b.id) o.selected=true; branchSel.appendChild(o); });
+      branchSel.addEventListener('change', function(){ sb.from('profiles').update({branch_id: branchSel.value||null}).eq('id',p.id).then(function(){ loadPeopleTable(); loadTeamTable(); }); });
+      branchTd.appendChild(branchSel);
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* ---------------- HIRING ---------------- */
+function loadCandidates(){
+  sb.from('hiring_candidates').select('*').order('created_at',{ascending:false}).then(function(res){
+    state.candidates = res.data || [];
+    var body = $('candidateBody'); body.innerHTML='';
+    if (!state.candidates.length) { $('candidateEmpty').hidden=false; $('candidateTable').hidden=true; return; }
+    $('candidateEmpty').hidden=true; $('candidateTable').hidden=false;
+    state.candidates.forEach(function(c){
+      var docs = [c.aadhaar_received?'Aadhaar':'', c.pan_received?'PAN':'', c.education_docs_received?'Edu':''].filter(Boolean).join(', ') || 'None yet';
+      var tr=document.createElement('tr');
+      tr.innerHTML = '<td>'+escapeHtml(c.full_name)+'</td><td class="muted">'+escapeHtml(c.job_role||'—')+'</td><td class="muted">'+escapeHtml(c.phone||'—')+'</td><td class="muted">'+docs+'</td><td><span class="pill pill-'+(c.status||'applied')+'">'+(c.status||'applied')+'</span></td><td></td>';
+      var actionTd = tr.lastElementChild;
+      if (c.status !== 'hired') {
+        var statusSel = document.createElement('select'); statusSel.className='status';
+        ['applied','interview','selected','rejected'].forEach(function(s){ var o=document.createElement('option'); o.value=s; o.textContent=s; if((c.status||'applied')===s) o.selected=true; statusSel.appendChild(o); });
+        statusSel.addEventListener('change', function(){ sb.from('hiring_candidates').update({status:statusSel.value}).eq('id',c.id).then(loadCandidates); });
+        actionTd.appendChild(statusSel);
+        var hireBtn = document.createElement('button'); hireBtn.className='btn btn-sm btn-solid'; hireBtn.style.marginLeft='6px'; hireBtn.textContent='Hire';
+        hireBtn.addEventListener('click', function(){ openHireModal(c); });
+        actionTd.appendChild(hireBtn);
+      } else {
+        actionTd.innerHTML = '<span class="muted">Staff account created</span>';
+      }
+      body.appendChild(tr);
+    });
+  });
+}
+$('newCandidateBtn').addEventListener('click', function(){
+  ['candName','candPhone','candAddress','candDob','candEmName','candEmPhone','candJoining','candExperience','candShift','candSkills','candExpSalary'].forEach(function(id){ $(id).value=''; });
+  $('candGender').value=''; $('candJobRole').value='Hairdresser';
+  $('candAadhaar').checked=false; $('candPan').checked=false; $('candEdu').checked=false;
+  $('candidateMsg').className='msg';
+  $('candidateModal').classList.add('on');
+});
+$('candidateCancelBtn').addEventListener('click', function(){ $('candidateModal').classList.remove('on'); });
+$('candidateSaveBtn').addEventListener('click', function(){
+  var name = $('candName').value.trim();
+  if (!name) { showMsg($('candidateMsg'),'Full name is required.','err'); return; }
+  var payload = {
+    full_name:name, phone:$('candPhone').value.trim()||null, address:$('candAddress').value.trim()||null, dob:$('candDob').value||null, gender:$('candGender').value||null,
+    emergency_contact_name:$('candEmName').value.trim()||null, emergency_contact_phone:$('candEmPhone').value.trim()||null, expected_joining_date:$('candJoining').value||null,
+    job_role:$('candJobRole').value, experience_years:$('candExperience').value||null, skills:$('candSkills').value||null, expected_salary:$('candExpSalary').value||null, shift:$('candShift').value||null,
+    aadhaar_received:$('candAadhaar').checked, pan_received:$('candPan').checked, education_docs_received:$('candEdu').checked,
+    branch_id: state.viewingBranchId, created_by: state.profile.id, status:'applied'
+  };
+  sb.from('hiring_candidates').insert(payload).then(function(res){
+    if (res.error) { showMsg($('candidateMsg'), res.error.message, 'err'); return; }
+    $('candidateModal').classList.remove('on'); loadCandidates();
+  });
+});
+
+function openHireModal(c){
+  $('hireCandidateId').value = c.id;
+  populateBranchSelect($('hireBranch'));
+  if (c.branch_id) $('hireBranch').value = c.branch_id; else if (state.viewingBranchId) $('hireBranch').value = state.viewingBranchId;
+  $('hireRole').value='staff'; $('hirePassword').value=''; $('hireMsg').className='msg';
+  $('hireModal').classList.add('on');
+}
+$('hireCancelBtn').addEventListener('click', function(){ $('hireModal').classList.remove('on'); });
+$('hireSaveBtn').addEventListener('click', function(){
+  var pw = $('hirePassword').value;
+  if (!pw || pw.length<6) { showMsg($('hireMsg'),'Password must be at least 6 characters.','err'); return; }
+  var candId = $('hireCandidateId').value;
+  var c = state.candidates.find(function(x){return x.id===candId;});
+  staffAdmin('create_staff', { full_name:c.full_name, role:$('hireRole').value, branch_id:$('hireBranch').value, password:pw, phone:c.phone||null }).then(function(res){
+    if (res.status !== 200) { showMsg($('hireMsg'), res.body.error || 'Could not create staff account.', 'err'); return; }
+    var profileId = res.body.user_id;
+    sb.from('staff_details').upsert({
+      profile_id: profileId, address:c.address, dob:c.dob, gender:c.gender, emergency_contact_name:c.emergency_contact_name, emergency_contact_phone:c.emergency_contact_phone,
+      job_role:c.job_role, experience_years:c.experience_years, skills:c.skills, expected_salary:c.expected_salary, shift:c.shift,
+      joining_date: c.expected_joining_date, employment_status:'active',
+      aadhaar_verified:c.aadhaar_received, pan_verified:c.pan_received, education_verified:c.education_docs_received
+    }, {onConflict:'profile_id'}).then(function(){
+      sb.from('hiring_candidates').update({status:'hired', hired_profile_id:profileId}).eq('id', candId).then(function(){
+        $('hireModal').classList.remove('on');
+        alert('Staff ID: '+res.body.staff_id+' — share this with '+c.full_name+' along with the password you set.');
+        loadCandidates(); loadTeamTable(); loadPeopleTable(); loadStaffForBranch();
+      });
+    });
+  });
+});
+
+/* ---------------- REPORTS ---------------- */
+$('repFrom').value = todayStr(); $('repTo').value = todayStr();
+$('repRunBtn').addEventListener('click', runReports);
+function runReports(){
+  var from = ($('repFrom').value||todayStr()) + 'T00:00:00';
+  var to = ($('repTo').value||todayStr()) + 'T23:59:59';
+  var q = sb.from('invoices').select('*, invoice_items(qty, price, service_id, services(name))').gte('created_at', from).lte('created_at', to);
+  if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
+  q.then(function(res){
+    var rows = res.data || [];
+    var revenue = rows.reduce(function(a,r){return a+Number(r.total||0);},0);
+    var cash=0,card=0,upi=0;
+    rows.forEach(function(r){ if(r.payment_method==='cash') cash+=Number(r.total); else if(r.payment_method==='card') card+=Number(r.total); else if(r.payment_method==='upi') upi+=Number(r.total); });
+    $('repRevenue').textContent = fmtMoney(revenue); $('repInvoices').textContent = rows.length;
+    $('repCash').textContent = fmtMoney(cash); $('repCard').textContent = fmtMoney(card); $('repUpi').textContent = fmtMoney(upi);
+
+    var svcMap = {};
+    rows.forEach(function(r){ (r.invoice_items||[]).forEach(function(it){
+      if (!it.service_id) return;
+      var name = it.services ? it.services.name : 'Service';
+      if (!svcMap[name]) svcMap[name] = {qty:0, revenue:0};
+      svcMap[name].qty += Number(it.qty); svcMap[name].revenue += Number(it.qty)*Number(it.price);
+    }); });
+    var svcRows = Object.keys(svcMap).map(function(k){ return {name:k, qty:svcMap[k].qty, revenue:svcMap[k].revenue}; }).sort(function(a,b){return b.revenue-a.revenue;}).slice(0,10);
+    var svcBody = $('popServiceBody'); svcBody.innerHTML='';
+    svcRows.forEach(function(r){ var tr=document.createElement('tr'); tr.innerHTML='<td>'+escapeHtml(r.name)+'</td><td>'+r.qty+'</td><td>'+fmtMoney(r.revenue)+'</td>'; svcBody.appendChild(tr); });
+
+    var staffMap = {};
+    rows.forEach(function(r){ if (!r.staff_id) return; if (!staffMap[r.staff_id]) staffMap[r.staff_id]={count:0,revenue:0}; staffMap[r.staff_id].count++; staffMap[r.staff_id].revenue+=Number(r.total); });
+    var staffBody = $('staffPerfBody'); staffBody.innerHTML='';
+    Object.keys(staffMap).sort(function(a,b){return staffMap[b].revenue-staffMap[a].revenue;}).forEach(function(sid){
+      var tr=document.createElement('tr'); tr.innerHTML='<td>'+escapeHtml(staffNameById(sid))+'</td><td>'+staffMap[sid].count+'</td><td>'+fmtMoney(staffMap[sid].revenue)+'</td>'; staffBody.appendChild(tr);
+    });
+  });
+
+  var alertBody = $('invAlertBody'); alertBody.innerHTML='';
+  var alertRows = [];
+  var pq = sb.from('products').select('*'); if (state.viewingBranchId) pq = pq.eq('branch_id', state.viewingBranchId);
+  var eq = sb.from('equipment').select('*'); if (state.viewingBranchId) eq = eq.eq('branch_id', state.viewingBranchId);
+  Promise.all([pq, eq]).then(function(results){
+    (results[0].data||[]).forEach(function(p){ if (Number(p.quantity) <= Number(p.reorder_level)) alertRows.push({item:p.name, type:'Low stock', detail:p.quantity+' '+(p.unit||'pcs')+' left (reorder at '+p.reorder_level+')'}); });
+    (results[1].data||[]).forEach(function(e){ if (e.status !== 'working') alertRows.push({item:e.name, type:'Equipment', detail:e.status}); });
+    if (!alertRows.length) { $('invAlertEmpty').hidden=false; $('invAlertTable').hidden=true; }
+    else { $('invAlertEmpty').hidden=true; $('invAlertTable').hidden=false;
+      alertRows.forEach(function(a){ var tr=document.createElement('tr'); tr.innerHTML='<td>'+escapeHtml(a.item)+'</td><td class="muted">'+a.type+'</td><td>'+escapeHtml(a.detail)+'</td>'; alertBody.appendChild(tr); });
+    }
+  });
+}
+
+/* ---------------- SETTINGS ---------------- */
+$('saveLoyaltyBtn').addEventListener('click', function(){
+  var per_rupees = Number($('setLoyaltyRupees').value)||100;
+  var points = Number($('setLoyaltyPoints').value)||1;
+  sb.from('app_settings').update({ value: {per_rupees:per_rupees, points:points} }).eq('key','loyalty_points_per_rupee').then(function(res){
+    if (res.error) { showMsg($('settingsLoyMsg'), res.error.message, 'err'); return; }
+    showMsg($('settingsLoyMsg'), 'Saved.', 'ok'); loadSettings();
+  });
+});
+$('saveSalonBtn').addEventListener('click', function(){
+  var name = $('setSalonName').value.trim() || "Plaza's Salon";
+  var gst = Number($('setGstRate').value)||0;
+  sb.from('app_settings').update({ value: {name:name, gst_rate:gst} }).eq('key','salon_info').then(function(res){
+    if (res.error) { showMsg($('settingsSalonMsg'), res.error.message, 'err'); return; }
+    showMsg($('settingsSalonMsg'), 'Saved.', 'ok'); loadSettings();
+  });
+});
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plaza OS — Business System</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0c0c0d; --charcoal:#161513; --panel:#1c1a17; --panel2:#221f1b;
+  --gold:#c9a227; --gold-light:#e8c766; --gold-dim:#8c7a54;
+  --ivory:#f3efe6; --ivory-dim:#cfc7b4;
+  --line: rgba(201,162,39,0.28);
+  --serif: "Bodoni Moda","Times New Roman",Georgia,serif;
+  --sans: "Jost","Segoe UI",Arial,sans-serif;
+  --good:#7fae6a; --warn:#c98f27; --bad:#b25b4a;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--black);color:var(--ivory);font-family:var(--sans);}
+a{color:var(--gold-light);}
+button{font:inherit;cursor:pointer;}
+input,select,textarea{font:inherit;}
+[hidden]{display:none !important;}
+
+/* ---------- login ---------- */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{max-width:420px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:36px 32px;text-align:center;}
+.login-card .brand{font-family:var(--serif);font-weight:700;font-size:1.7rem;margin-bottom:4px;}
+.login-card .brand span{color:var(--gold-light);}
+.login-card p{color:var(--ivory-dim);font-size:.9rem;line-height:1.6;}
+.field{margin:20px 0;text-align:left;}
+label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:8px;}
+input[type=email],input[type=text],input[type=tel],input[type=date],input[type=time],input[type=number],input[type=password],select,textarea{
+  width:100%;padding:11px 13px;background:var(--black);border:1px solid var(--line);border-radius:6px;color:var(--ivory);font-size:.92rem;
+}
+textarea{resize:vertical;min-height:70px;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+.btn{padding:11px 18px;border-radius:6px;font-weight:600;font-size:.88rem;letter-spacing:.02em;border:1px solid var(--line);background:transparent;color:var(--ivory-dim);}
+.btn:hover{border-color:var(--gold);color:var(--ivory);}
+.btn-solid{background:var(--gold);color:var(--black);border:none;}
+.btn-solid:hover{background:var(--gold-light);color:var(--black);}
+.btn-solid:disabled{opacity:.5;}
+.btn-danger{border-color:var(--bad);color:var(--bad);}
+.btn-danger:hover{background:rgba(178,91,74,.12);}
+.btn-sm{padding:6px 10px;font-size:.76rem;}
+.btn-block{width:100%;}
+.msg{margin-top:16px;font-size:.85rem;padding:11px 13px;border-radius:6px;display:none;text-align:left;}
+.msg.ok{display:block;background:rgba(127,174,106,.12);color:#a8cf95;border:1px solid rgba(127,174,106,.3);}
+.msg.err{display:block;background:rgba(178,91,74,.12);color:#e0998a;border:1px solid rgba(178,91,74,.3);}
+
+/* ---------- app shell ---------- */
+#appShell{display:none;min-height:100vh;}
+#appShell.on{display:flex;}
+.sidebar{width:230px;flex:none;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar .brand{font-family:var(--serif);font-weight:700;font-size:1.25rem;margin-bottom:2px;}
+.sidebar .brand span{color:var(--gold-light);}
+.sidebar .tag{font-size:.7rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:22px;}
+.navlist{list-style:none;margin:0;padding:0;flex:1;}
+.navlist li{margin-bottom:2px;}
+.navlist button{width:100%;text-align:left;padding:10px 12px;border-radius:6px;background:transparent;border:none;color:var(--ivory-dim);font-size:.88rem;display:flex;align-items:center;gap:10px;}
+.navlist button:hover{background:rgba(201,162,39,.08);color:var(--ivory);}
+.navlist button.active{background:rgba(201,162,39,.15);color:var(--gold-light);font-weight:600;}
+.side-foot{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;font-size:.8rem;color:var(--ivory-dim);}
+.side-foot .who{color:var(--ivory);font-weight:600;margin-bottom:2px;}
+.side-foot .role{text-transform:capitalize;color:var(--gold-dim);}
+.side-foot a{display:block;margin-top:10px;font-size:.8rem;}
+.branch-switch{margin-bottom:16px;}
+.branch-switch select{font-size:.8rem;padding:8px 10px;}
+
+main.content{flex:1;padding:32px 36px;max-width:1200px;min-width:0;}
+h1{font-family:var(--serif);font-weight:700;font-size:1.7rem;margin:0 0 6px;}
+h2.h{font-family:var(--serif);font-size:1.1rem;margin:0 0 14px;}
+.sub{color:var(--ivory-dim);margin:0 0 26px;font-size:.92rem;}
+.view{display:none;}
+.view.active{display:block;}
+
+.stat-row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:28px;}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 20px;min-width:120px;}
+.stat .n{font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold-light);}
+.stat .l{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ivory-dim);margin-top:2px;}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;}
+.toolbar .left{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.search{min-width:220px;}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:18px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
+table{width:100%;border-collapse:collapse;min-width:760px;}
+thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gold-dim);font-weight:500;padding:13px 15px;background:var(--panel);border-bottom:1px solid var(--line);white-space:nowrap;}
+tbody td{padding:13px 15px;border-bottom:1px solid var(--line);font-size:.87rem;vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(201,162,39,.04);}
+tbody tr.clickable{cursor:pointer;}
+.muted{color:var(--ivory-dim);}
+.empty{padding:50px 20px;text-align:center;color:var(--ivory-dim);}
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;}
+.pill-booked{background:rgba(201,162,39,.15);color:var(--gold-light);}
+.pill-confirmed{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-in_progress{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-completed{background:rgba(127,174,106,.25);color:#c9e6ba;}
+.pill-cancelled{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-no_show{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-owner{background:rgba(201,162,39,.2);color:var(--gold-light);}
+.pill-manager{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-staff{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-customer{background:rgba(255,255,255,.06);color:var(--ivory-dim);}
+.pill-active{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-terminated{background:rgba(178,91,74,.15);color:var(--bad);}
+.pill-hired{background:rgba(127,174,106,.15);color:var(--good);}
+.pill-applied{background:rgba(140,122,84,.2);color:var(--ivory-dim);}
+.pill-interview{background:rgba(201,162,39,.15);color:var(--gold-light);}
+.pill-rejected{background:rgba(178,91,74,.15);color:var(--bad);}
+select.status{background:var(--black);color:var(--ivory);border:1px solid var(--line);border-radius:5px;padding:6px 8px;font-size:.8rem;}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--good);border-radius:5px;color:var(--good);font-size:.78rem;text-decoration:none;white-space:nowrap;}
+.wa-btn:hover{background:rgba(127,174,106,.12);}
+.doc-check{display:flex;align-items:center;gap:8px;font-size:.85rem;margin:6px 0;}
+.kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:.85rem;}
+.kv:last-child{border-bottom:none;}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50;}
+.overlay.on{display:flex;}
+.modal{background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-width:560px;width:100%;padding:28px;}
+.modal.wide{max-width:720px;}
+.modal h2{font-family:var(--serif);font-size:1.3rem;margin:0 0 18px;}
+.modal .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.modal .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+.chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.chip{padding:6px 12px;border:1px solid var(--line);border-radius:100px;font-size:.8rem;color:var(--ivory-dim);}
+.chip.sel{background:rgba(201,162,39,.15);border-color:var(--gold);color:var(--gold-light);}
+.svc-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:.86rem;}
+.svc-row:last-child{border-bottom:none;}
+.item-row{display:grid;grid-template-columns:1fr 70px 90px 30px;gap:8px;align-items:center;margin-bottom:8px;}
+.item-row input{padding:8px;}
+.rm-btn{background:none;border:none;color:var(--bad);font-size:1.1rem;}
+
+@media (max-width:860px){
+  #appShell.on{flex-direction:column;}
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap;align-items:center;padding:14px 16px;gap:10px;}
+  .sidebar .brand,.sidebar .tag{display:none;}
+  .navlist{display:flex;flex-wrap:wrap;flex:1;gap:4px;}
+  .navlist li{margin:0;}
+  .side-foot{display:none;}
+  main.content{padding:20px 16px;}
+  .modal .row2,.modal .row3{grid-template-columns:1fr;}
+  .grid2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="brand">Plaza <span>OS</span></div>
+    <p>Sign in with your Staff ID (or owner email) and password.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginId">Staff ID or Email</label>
+        <input type="text" id="loginId" required placeholder="PZS0001 or you@email.com" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn btn-solid btn-block" id="loginBtn">Sign In</button>
+    </form>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <aside class="sidebar">
+    <div class="brand">Plaza <span>OS</span></div>
+    <div class="tag">Business System</div>
+
+    <div class="branch-switch" id="branchSwitchWrap" hidden>
+      <label>Viewing Branch</label>
+      <select id="branchSwitch"></select>
+    </div>
+
+    <ul class="navlist" id="navList">
+      <li><button data-view="dashboard" class="active">Dashboard</button></li>
+      <li><button data-view="appointments">Appointments</button></li>
+      <li><button data-view="billing">Billing / POS</button></li>
+      <li><button data-view="clients">Clients</button></li>
+      <li><button data-view="loyalty">Loyalty Points</button></li>
+      <li><button data-view="inbox">Website Enquiries</button></li>
+      <li><button data-view="services" id="navServices" hidden>Services & Offers</button></li>
+      <li><button data-view="staff" id="navStaff" hidden>Staff & Branches</button></li>
+      <li><button data-view="hiring" id="navHiring" hidden>Hiring</button></li>
+      <li><button data-view="reports" id="navReports" hidden>Reports</button></li>
+      <li><button data-view="settings" id="navSettings" hidden>Settings</button></li>
+    </ul>
+
+    <div class="side-foot">
+      <div class="who" id="whoName">—</div>
+      <div class="role" id="whoRole">—</div>
+      <div class="role" id="whoStaffId">—</div>
+      <a href="index.html">← Salon Site</a>
+      <a href="client.html">Customer Portal (preview)</a>
+      <a href="#" id="signOutLink">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <h1>Dashboard</h1>
+      <p class="sub" id="dashSub">Today's snapshot.</p>
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="statToday">0</div><div class="l">Today's Appts</div></div>
+        <div class="stat"><div class="n" id="statRevenue">₹0</div><div class="l">Today's Revenue</div></div>
+        <div class="stat"><div class="n" id="statCustomers">0</div><div class="l">Today's Customers</div></div>
+        <div class="stat"><div class="n" id="statUpcoming">0</div><div class="l">Upcoming (7d)</div></div>
+        <div class="stat"><div class="n" id="statClients">0</div><div class="l">Total Clients</div></div>
+        <div class="stat"><div class="n" id="statNewEnq">0</div><div class="l">New Enquiries</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="card" id="myDayCard">
+          <h2 class="h">My Day</h2>
+          <div id="attendanceBox" style="margin-bottom:14px;">
+            <div class="kv"><span>Today's attendance</span><span id="attStatus" class="muted">Loading…</span></div>
+            <div class="actions-row" style="margin-top:10px;">
+              <button class="btn btn-solid btn-sm" id="checkInBtn">Check In</button>
+              <button class="btn btn-sm" id="checkOutBtn">Check Out</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--line);padding-top:14px;">
+            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dim);margin-bottom:8px;">Next Customer</div>
+            <div id="nextCustomerBox" class="muted">Loading…</div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="h">Today's Appointments</h2>
+          <div class="table-wrap"><table id="todayTable">
+            <thead><tr><th>Time</th><th>Client</th><th>Staff</th><th>Status</th></tr></thead>
+            <tbody id="todayBody"></tbody>
+          </table><div class="empty" id="todayEmpty" hidden>Nothing booked for today yet.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPOINTMENTS -->
+    <section class="view" id="view-appointments">
+      <h1>Appointments</h1>
+      <p class="sub">Book & manage appointments across the day.</p>
+      <div class="toolbar">
+        <div class="left">
+          <input type="date" id="apptDateFilter" />
+          <button class="btn" id="apptTodayBtn">Today</button>
+        </div>
+        <button class="btn btn-solid" id="newApptBtn">+ New Appointment</button>
+      </div>
+      <div class="table-wrap"><table id="apptTable">
+        <thead><tr><th>Time</th><th>Client</th><th>Phone</th><th>Service(s)</th><th>Staff</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody id="apptBody"></tbody>
+      </table><div class="empty" id="apptEmpty" hidden>No appointments for this date.</div></div>
+    </section>
+
+    <!-- BILLING / POS -->
+    <section class="view" id="view-billing">
+      <h1>Billing / POS</h1>
+      <p class="sub">Create a bill for an in-store or online visit.</p>
+      <div class="toolbar">
+        <div></div>
+        <button class="btn btn-solid" id="newInvoiceBtn">+ New Bill</button>
+      </div>
+      <div class="table-wrap"><table id="invoiceTable">
         <thead><tr><th>Date</th><th>Client</th><th>Items</th><th>Payment</th><th>Total</th><th>Points</th></tr></thead>
         <tbody id="invoiceBody"></tbody>
       </table><div class="empty" id="invoiceEmpty" hidden>No bills yet.</div></div>

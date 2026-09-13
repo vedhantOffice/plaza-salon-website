@@ -767,6 +767,11 @@ function fmtDateTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toL
 function fmtTime(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
 function fmtMoney(n){ return '₹' + Math.round(Number(n)||0).toLocaleString('en-IN'); }
 function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// A bare "2026-09-16T15:30:00" is read as UTC by the database, which pushed every saved time and
+// every day filter 5½ hours out. Going through Date sends a real instant in local time instead.
+function localISO(dateStr, timeStr){ return new Date(dateStr + 'T' + timeStr + ':00').toISOString(); }
+function dayStartISO(dateStr){ return new Date(dateStr + 'T00:00:00').toISOString(); }
+function dayEndISO(dateStr){ return new Date(dateStr + 'T23:59:59.999').toISOString(); }
 
 // Scrolling the page with the cursor over an open/focused <select> makes the browser change
 // its value and fire 'change' -- which silently rewrote roles and locked staff out of the app.
@@ -957,8 +962,8 @@ document.querySelectorAll('#navList button').forEach(function(btn){
 function loadDashboard(){
   var bid = state.viewingBranchId;
   var today = todayStr();
-  var todayStart = today + 'T00:00:00';
-  var todayEnd = today + 'T23:59:59';
+  var todayStart = dayStartISO(today);
+  var todayEnd = dayEndISO(today);
   var weekEnd = new Date(Date.now()+7*86400000).toISOString();
 
   var apQ = sb.from('appointments').select('*, clients(full_name,phone)').gte('start_time', todayStart).lte('start_time', todayEnd).order('start_time');
@@ -1026,7 +1031,7 @@ $('checkOutBtn').addEventListener('click', function(){
 function loadNextCustomer(){
   if (state.profile.role === 'owner') { $('nextCustomerBox').textContent = 'Owners see the branch schedule in Appointments.'; return; }
   var nowIso = new Date().toISOString();
-  var todayEnd = todayStr()+'T23:59:59';
+  var todayEnd = dayEndISO(todayStr());
   sb.from('appointments').select('*, clients(full_name,phone)').eq('staff_id', state.profile.id).gte('start_time', nowIso).lte('start_time', todayEnd).in('status',['booked','confirmed']).order('start_time').limit(1).then(function(res){
     var r = res.data && res.data[0];
     if (!r) { $('nextCustomerBox').innerHTML = '<span class="muted">No more customers scheduled today.</span>'; return; }
@@ -1045,8 +1050,8 @@ $('apptSearch').addEventListener('input', function(){ renderAppointments(); });
 
 function loadAppointments(){
   var date = $('apptDateFilter').value || todayStr();
-  var start = date + 'T00:00:00';
-  var end = date + 'T23:59:59';
+  var start = dayStartISO(date);
+  var end = dayEndISO(date);
   var q = sb.from('appointments').select('*, clients(full_name,phone,user_id), appointment_services(service_id, price, services(name))').gte('start_time', start).lte('start_time', end).order('start_time');
   if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
   q.then(function(res){
@@ -1201,7 +1206,7 @@ $('apptSaveBtn').addEventListener('click', function(){
   var total = state.services.filter(function(s){return state.chosenServiceIds.indexOf(s.id)>-1;}).reduce(function(a,s){return a+Number(s.price);},0);
   sb.from('appointments').insert({
     branch_id: branchId, client_id: state.chosenClientId, staff_id: $('apptStaff').value || null,
-    start_time: start, status:'booked', source:'staff', notes: $('apptNotes').value||null, total_amount: total,
+    start_time: localISO($('apptDate').value, $('apptTime').value), status:'booked', source:'staff', notes: $('apptNotes').value||null, total_amount: total,
     created_by: state.profile.id
   }).select().single().then(function(res){
     if (res.error) { showMsg($('apptMsg'), res.error.message, 'err'); return; }
@@ -2041,8 +2046,8 @@ $('hireSaveBtn').addEventListener('click', function(){
 $('repFrom').value = todayStr(); $('repTo').value = todayStr();
 $('repRunBtn').addEventListener('click', runReports);
 function runReports(){
-  var from = ($('repFrom').value||todayStr()) + 'T00:00:00';
-  var to = ($('repTo').value||todayStr()) + 'T23:59:59';
+  var from = dayStartISO($('repFrom').value||todayStr());
+  var to = dayEndISO($('repTo').value||todayStr());
   var q = sb.from('invoices').select('*, invoice_items(qty, price, service_id, services(name))').gte('created_at', from).lte('created_at', to);
   if (state.viewingBranchId) q = q.eq('branch_id', state.viewingBranchId);
   q.then(function(res){

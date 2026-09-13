@@ -207,6 +207,15 @@ sb.auth.onAuthStateChange(function(event, session){ if (session) boot(); else sh
 
 function showLogin(){ $('loginView').hidden = false; $('appView').hidden = true; $('signOutLink').hidden = true; }
 
+// Link any in-store client record (added by staff at the counter) that shares this phone number
+// but has no online account attached yet. This is what makes loyalty points actually start
+// counting once someone signs in -- without it, a walk-in visit and a website login are two
+// disconnected records and points never land anywhere.
+function linkPhoneClients(phone){
+  if (!phone) return Promise.resolve();
+  return sb.from('clients').update({ user_id: state.profile.id }).eq('phone', phone).is('user_id', null).then(function(){});
+}
+
 function boot(){
   $('loginView').hidden = true;
   $('appView').hidden = false;
@@ -222,7 +231,7 @@ function boot(){
         $('profName').value = state.profile.full_name || '';
         $('profPhone').value = state.profile.phone || '';
       } else {
-        showMain();
+        linkPhoneClients(state.profile.phone).then(showMain);
       }
     });
   });
@@ -234,8 +243,10 @@ $('profSaveBtn').addEventListener('click', function(){
   sb.from('profiles').update({ full_name: name, phone: phone }).eq('id', state.profile.id).then(function(res){
     if (res.error) { showMsg($('profMsg'), res.error.message, 'err'); return; }
     state.profile.full_name = name; state.profile.phone = phone;
-    $('profileCard').hidden = true;
-    showMain();
+    linkPhoneClients(phone).then(function(){
+      $('profileCard').hidden = true;
+      showMain();
+    });
   });
 });
 
@@ -312,9 +323,17 @@ $('bookSaveBtn').addEventListener('click', function(){
     };
     if (cres.data) { proceed(cres.data.id); }
     else {
-      sb.from('clients').insert({ branch_id: branchId, full_name: state.profile.full_name, phone: state.profile.phone, user_id: state.profile.id }).select().single().then(function(newc){
-        if (newc.error) { showMsg($('bookMsg'), newc.error.message, 'err'); return; }
-        proceed(newc.data.id);
+      // No linked record for this branch yet -- check for an in-store record with the same phone
+      // (added by staff, not yet linked) before creating a brand new one, so history stays together.
+      sb.from('clients').select('id').eq('phone', state.profile.phone).eq('branch_id', branchId).is('user_id', null).maybeSingle().then(function(existing){
+        if (existing.data) {
+          sb.from('clients').update({ user_id: state.profile.id }).eq('id', existing.data.id).then(function(){ proceed(existing.data.id); });
+          return;
+        }
+        sb.from('clients').insert({ branch_id: branchId, full_name: state.profile.full_name, phone: state.profile.phone, user_id: state.profile.id }).select().single().then(function(newc){
+          if (newc.error) { showMsg($('bookMsg'), newc.error.message, 'err'); return; }
+          proceed(newc.data.id);
+        });
       });
     }
   });
